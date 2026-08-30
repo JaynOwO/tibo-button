@@ -11,4 +11,5 @@
 - Updated GitHub Actions checkout/setup-java actions to v5.
 - Updated the Gradle setup action to v6 to remove the Node.js 20 deprecation warning.
 - Updated the artifact upload action to v6 for the same Node.js 24 runtime.
+- Added a unit-test step before the APK build in GitHub Actions.
 - Bumped Android versionCode to 2 and versionName to 0.2.0.
