@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.work.WorkManager
 import com.tibobutton.app.data.NotificationPrefs
 import com.tibobutton.app.data.ResetApi
@@ -60,12 +61,17 @@ class MainActivity : Activity() {
             refreshButton.isEnabled = false
             refreshButton.text = "正在刷新…"
             val workId = WidgetScheduler.refreshNow(this)
-            WorkManager.getInstance(this).getWorkInfoByIdLiveData(workId).observe(this) { info ->
-                if (info == null || !info.state.isFinished) return@observe
-                renderCached()
-                refreshButton.isEnabled = true
-                refreshButton.text = "立即刷新"
-            }
+            val workInfo = WorkManager.getInstance(this).getWorkInfoById(workId)
+            workInfo.addListener({
+                val info = runCatching { workInfo.get() }.getOrNull()
+                if (info?.state?.isFinished == true) {
+                    runOnUiThread {
+                        renderCached()
+                        refreshButton.isEnabled = true
+                        refreshButton.text = "立即刷新"
+                    }
+                }
+            }, ContextCompat.getMainExecutor(this))
         }
 
         evidenceButton.setOnClickListener {
