@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Tibo Button</string>
+    <string name="widget_description_wide">Tibo 重置雷达 4×2</string>
+    <string name="widget_description_small">Tibo 重置雷达 2×2</string>
+</resources>

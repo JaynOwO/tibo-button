@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0B0D12">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚡ Tibo Button"
+            android:textColor="#F5F7FA"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Android 主屏幕上的 Codex / ChatGPT Work 重置雷达。"
+            android:textColor="#AEB6C2"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/widget_bg"
+            android:padding="18dp"
+            android:text="等待首次刷新…"
+            android:textColor="#F5F7FA"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="立即刷新" />
+
+        <Button
+            android:id="@+id/sourceButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="打开 Reset Beacon" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="添加小组件：长按桌面 → 小组件 → Tibo Button。\n\n后台刷新由 Android 调度，15 分钟是请求周期，不保证精确到分钟。Widget 上的 ↻ 可以随时强制刷新。\n\n数据来自独立公共数据源 Reset Beacon；它不是 OpenAI 官方服务，也不会读取你的个人 Codex 用量。"
+            android:textColor="#7F8998"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+</ScrollView>
