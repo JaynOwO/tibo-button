@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.widget.RemoteViews
+import android.view.View
 import com.tibobutton.app.MainActivity
 import com.tibobutton.app.R
 import com.tibobutton.app.data.ResetLevel
@@ -19,40 +20,45 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object WidgetRenderer {
-    fun updateAll(context: Context) {
+    fun updateAll(context: Context, refreshing: Boolean = false) {
         val manager = AppWidgetManager.getInstance(context)
         val state = WidgetPrefs.load(context)
 
         val wideComponent = ComponentName(context, TiboWideWidgetProvider::class.java)
         manager.getAppWidgetIds(wideComponent).forEach { id ->
-            manager.updateAppWidget(id, wideViews(context, state))
+            manager.updateAppWidget(id, wideViews(context, state, refreshing))
         }
 
         val smallComponent = ComponentName(context, TiboSmallWidgetProvider::class.java)
         manager.getAppWidgetIds(smallComponent).forEach { id ->
-            manager.updateAppWidget(id, smallViews(context, state))
+            manager.updateAppWidget(id, smallViews(context, state, refreshing))
         }
     }
 
-    private fun wideViews(context: Context, state: WidgetState): RemoteViews {
+    private fun wideViews(context: Context, state: WidgetState, refreshing: Boolean): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_wide).apply {
             setTextViewText(R.id.status_label, "${state.level.emoji} ${state.level.label}")
             setTextColor(R.id.status_label, levelColor(state.level))
             setTextViewText(R.id.probability, probabilityText(state, wide = true))
             setTextViewText(R.id.next_time, nextText(state, short = false))
             setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}")
-            setTextViewText(R.id.footer, footerText(state))
+            setTextViewText(R.id.footer, if (refreshing) "Reset Beacon · 正在刷新…" else footerText(state))
+            setViewVisibility(R.id.refresh, if (refreshing) View.GONE else View.VISIBLE)
+            setViewVisibility(R.id.refresh_loading, if (refreshing) View.VISIBLE else View.GONE)
             wireClicks(context, this, state, titleClickable = true)
         }
     }
 
-    private fun smallViews(context: Context, state: WidgetState): RemoteViews {
+    private fun smallViews(context: Context, state: WidgetState, refreshing: Boolean): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_small).apply {
             setTextViewText(R.id.status_label, "${state.level.emoji} ${state.level.label}")
             setTextColor(R.id.status_label, levelColor(state.level))
             setTextViewText(R.id.probability, probabilityText(state, wide = false))
             setTextViewText(R.id.next_time, "下次：${nextText(state, short = true)}")
             setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}")
+            setTextViewText(R.id.footer, if (refreshing) "Reset Beacon · 正在刷新…" else footerText(state))
+            setViewVisibility(R.id.refresh, if (refreshing) View.GONE else View.VISIBLE)
+            setViewVisibility(R.id.refresh_loading, if (refreshing) View.VISIBLE else View.GONE)
             wireClicks(context, this, state, titleClickable = false)
         }
     }

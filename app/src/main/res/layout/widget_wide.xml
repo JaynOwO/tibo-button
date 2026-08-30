@@ -23,15 +23,31 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/refresh"
+        <FrameLayout
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:gravity="center"
-            android:background="@drawable/pill_bg"
-            android:text="↻"
-            android:textColor="#D8DEEA"
-            android:textSize="18sp" />
+            android:background="@drawable/pill_bg">
+
+            <TextView
+                android:id="@+id/refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="↻"
+                android:textColor="#D8DEEA"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/refresh_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="正在刷新"
+                android:gravity="center"
+                android:text="⟳"
+                android:textColor="#D8DEEA"
+                android:textSize="19sp"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 
     <LinearLayout

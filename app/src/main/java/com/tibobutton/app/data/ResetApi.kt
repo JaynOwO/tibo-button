@@ -16,6 +16,7 @@ class ResetApi {
     fun fetchForecast(): ForecastSnapshot {
         val json = JSONObject(get(FORECAST_URL))
         val probabilities = json.optJSONObject("probabilities")
+        val answer = json.optJSONObject("answer")
         return ForecastSnapshot(
             calculatedAt = json.optInstant("calculatedAt"),
             validUntil = json.optInstant("validUntil"),
@@ -23,7 +24,11 @@ class ResetApi {
             h24 = probabilities?.optJSONObject("h24")?.optNullableInt("display"),
             h48 = probabilities?.optJSONObject("h48")?.optNullableInt("display"),
             signalStage = json.optNullableString("signalStage")
-                ?: json.optJSONObject("latestAcknowledgement")?.optNullableString("stage")
+                ?: json.optJSONObject("latestAcknowledgement")?.optNullableString("stage"),
+            answerState = answer?.optNullableString("state"),
+            answerHeadline = answer?.optNullableString("headline"),
+            answerSecondLine = answer?.optNullableString("secondLine"),
+            answerDeadline = answer?.optInstant("deadline")
         )
     }
 
@@ -37,10 +42,6 @@ class ResetApi {
                 val sourceUrl = sources?.optJSONObject(0)?.optNullableString("url")
                 val evidence = item.optNullableString("evidenceUrl") ?: sourceUrl
 
-                // Reset Beacon's public contract guarantees event kind/status/scope and announcedAt.
-                // A normalized schedule instant is not part of the documented contract, so we
-                // probe a few harmless optional field names. If none exists, the UI says
-                // "已排期 · 时间见来源" instead of guessing from prose.
                 val scheduled = listOf(
                     "scheduledFor", "scheduledAt", "targetAt", "expectedAt",
                     "windowStart", "startsAt", "effectiveAt"
@@ -68,7 +69,7 @@ class ResetApi {
             connectTimeout = 10_000
             readTimeout = 12_000
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("User-Agent", "TiboButton/0.1 Android")
+            setRequestProperty("User-Agent", "TiboButton/0.2 Android (+https://github.com/JaynOwO/tibo-button)")
             useCaches = false
         }
         return try {

@@ -37,9 +37,15 @@ object ResetClassifier {
             .filter { it.announcedAt?.let { at -> Duration.between(at, now).toHours() in 0L..36L } == true }
             .maxByOrNull { it.announcedAt ?: Instant.EPOCH }
 
+        val canonicalState = forecast.answerState.orEmpty().lowercase()
+        val canonicalSchedule = forecast.answerDeadline != null ||
+            canonicalState.contains("schedul") || canonicalState.contains("confirmed")
+        val nextResetKnownButUnparsed = canonicalSchedule && forecast.answerDeadline == null &&
+            activeSchedule?.scheduledFor == null
+
         val level = when {
             stale -> ResetLevel.STALE
-            activeSchedule != null -> ResetLevel.CONFIRMED
+            canonicalSchedule || activeSchedule != null -> ResetLevel.CONFIRMED
             (forecast.h24 ?: -1) >= 75 -> ResetLevel.VERY_LIKELY
             activeIntent != null -> ResetLevel.POSSIBLE
             (forecast.h24 ?: -1) >= 45 -> ResetLevel.POSSIBLE
@@ -48,14 +54,19 @@ object ResetClassifier {
             else -> ResetLevel.UNKNOWN
         }
 
+        val primaryEvidence = activeSchedule ?: activeIntent ?: lastCompleted
+
         return WidgetState(
             level = level,
             h24 = if (stale) null else forecast.h24,
             h48 = if (stale) null else forecast.h48,
-            nextResetAt = activeSchedule?.scheduledFor,
-            nextResetKnownButUnparsed = activeSchedule != null && activeSchedule.scheduledFor == null,
+            nextResetAt = forecast.answerDeadline ?: activeSchedule?.scheduledFor,
+            nextResetKnownButUnparsed = nextResetKnownButUnparsed,
             lastResetAt = lastCompleted?.announcedAt,
-            evidenceUrl = activeSchedule?.evidenceUrl ?: activeIntent?.evidenceUrl ?: lastCompleted?.evidenceUrl,
+            evidenceUrl = primaryEvidence?.evidenceUrl,
+            evidenceSummary = null,
+            canonicalHeadline = forecast.answerHeadline,
+            canonicalSecondLine = forecast.answerSecondLine,
             updatedAt = forecast.calculatedAt ?: now,
             sourceStale = stale
         )
@@ -70,8 +81,6 @@ object ResetClassifier {
 
     private fun isRecentSchedule(event: HistoryEvent, now: Instant): Boolean {
         event.scheduledFor?.let { scheduled ->
-            // Keep a schedule visible until six hours after its target, matching the API docs'
-            // "missed" concept without second-guessing a still-propagating reset.
             return now.isBefore(scheduled.plus(Duration.ofHours(6)))
         }
         val announced = event.announcedAt ?: return false

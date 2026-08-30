@@ -24,6 +24,10 @@ abstract class BaseTiboWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_REFRESH) {
+            // Immediate visual confirmation: swap ↻ for a deterministic loading glyph
+            // before WorkManager starts the network request. RemoteViews animations are
+            // not reliable across launchers, so this must not depend on continuous motion.
+            WidgetRenderer.updateAll(context, refreshing = true)
             WidgetScheduler.refreshNow(context)
         }
     }

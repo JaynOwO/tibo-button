@@ -8,7 +8,11 @@ data class ForecastSnapshot(
     val publicationState: String,
     val h24: Int?,
     val h48: Int?,
-    val signalStage: String?
+    val signalStage: String?,
+    val answerState: String? = null,
+    val answerHeadline: String? = null,
+    val answerSecondLine: String? = null,
+    val answerDeadline: Instant? = null
 )
 
 data class HistoryEvent(
@@ -40,6 +44,9 @@ data class WidgetState(
     val nextResetKnownButUnparsed: Boolean = false,
     val lastResetAt: Instant? = null,
     val evidenceUrl: String? = null,
+    val evidenceSummary: String? = null,
+    val canonicalHeadline: String? = null,
+    val canonicalSecondLine: String? = null,
     val updatedAt: Instant? = null,
     val sourceStale: Boolean = false,
     val error: String? = null

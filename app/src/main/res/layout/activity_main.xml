@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Android 主屏幕上的 Codex / ChatGPT Work 重置雷达。"
+            android:text="Android 主屏幕上的 Codex / ChatGPT Work 共享额度重置雷达。"
             android:textColor="#AEB6C2"
             android:textSize="15sp" />
 
@@ -30,32 +30,104 @@
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/widget_bg"
             android:padding="18dp"
             android:text="等待首次刷新…"
             android:textColor="#F5F7FA"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/evidenceText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/widget_bg"
+            android:padding="18dp"
+            android:text="当前依据：等待同步"
+            android:textColor="#C8CFDA"
+            android:textSize="14sp" />
+
         <Button
             android:id="@+id/refreshButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="18dp"
             android:text="立即刷新" />
+
+        <Button
+            android:id="@+id/evidenceButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="打开最新依据" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="🔔 系统通知"
+            android:textColor="#F5F7FA"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/notificationPermissionStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="通知权限：检测中"
+            android:textColor="#AEB6C2"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/notificationPermissionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="允许系统通知" />
+
+        <CheckBox
+            android:id="@+id/notifyConfirmed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="已确定排期时通知"
+            android:textColor="#E5E9F0" />
+
+        <CheckBox
+            android:id="@+id/notifyCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="确认已重置时通知"
+            android:textColor="#E5E9F0" />
+
+        <CheckBox
+            android:id="@+id/notifyLikely"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="进入“很可能”时也通知（可能稍吵）"
+            android:textColor="#E5E9F0" />
+
+        <Button
+            android:id="@+id/testNotificationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="发送测试通知" />
 
         <Button
             android:id="@+id/sourceButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="18dp"
             android:text="打开 Reset Beacon" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="添加小组件：长按桌面 → 小组件 → Tibo Button。\n\n后台刷新由 Android 调度，15 分钟是请求周期，不保证精确到分钟。Widget 上的 ↻ 可以随时强制刷新。\n\n数据来自独立公共数据源 Reset Beacon；它不是 OpenAI 官方服务，也不会读取你的个人 Codex 用量。"
+            android:text="添加小组件：长按桌面 → 小组件 → Tibo Button。\n\n后台刷新由 Android 调度，15 分钟是请求周期，不保证精确到分钟。Widget 上的 ↻ 可以随时强制刷新；v0.2 点击后会立刻切换为旋转加载状态。\n\n数据来自独立公共数据源 Reset Beacon。概率用于共享额外重置，不是你个人的 5 小时 / 周额度刷新时间。\n\n非官方独立项目，与 OpenAI、Reset Beacon / Sound Media 或 Thibault ‘Tibo’ Sottiaux 无隶属、赞助或认可关系。Codex、ChatGPT 与 OpenAI 商标归其各自权利人所有。"
             android:textColor="#7F8998"
             android:textSize="13sp" />
 

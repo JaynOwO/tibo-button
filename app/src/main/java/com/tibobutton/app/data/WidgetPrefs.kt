@@ -17,6 +17,9 @@ object WidgetPrefs {
             put("nextResetKnownButUnparsed", state.nextResetKnownButUnparsed)
             putNullable("lastResetAt", state.lastResetAt?.toString())
             putNullable("evidenceUrl", state.evidenceUrl)
+            putNullable("evidenceSummary", state.evidenceSummary)
+            putNullable("canonicalHeadline", state.canonicalHeadline)
+            putNullable("canonicalSecondLine", state.canonicalSecondLine)
             putNullable("updatedAt", state.updatedAt?.toString())
             put("sourceStale", state.sourceStale)
             putNullable("error", state.error)
@@ -38,6 +41,9 @@ object WidgetPrefs {
                 nextResetKnownButUnparsed = o.optBoolean("nextResetKnownButUnparsed", false),
                 lastResetAt = o.optInstant("lastResetAt"),
                 evidenceUrl = o.optNullableString("evidenceUrl"),
+                evidenceSummary = o.optNullableString("evidenceSummary"),
+                canonicalHeadline = o.optNullableString("canonicalHeadline"),
+                canonicalSecondLine = o.optNullableString("canonicalSecondLine"),
                 updatedAt = o.optInstant("updatedAt"),
                 sourceStale = o.optBoolean("sourceStale", false),
                 error = o.optNullableString("error")

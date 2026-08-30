@@ -33,6 +33,45 @@ class ResetClassifierTest {
         assertEquals(ResetLevel.VERY_LIKELY, state.level)
     }
 
+    @Test fun canonicalScheduledAnswerWithoutDeadlineStaysExplicitlyUnparsed() {
+        val forecast = ForecastSnapshot(
+            calculatedAt = now,
+            validUntil = now.plusSeconds(3600),
+            publicationState = "high",
+            h24 = 12,
+            h48 = 34,
+            signalStage = null,
+            answerState = "scheduled",
+            answerHeadline = "已排期",
+            answerSecondLine = "具体时间见来源"
+        )
+
+        val state = ResetClassifier.build(forecast, emptyList(), now)
+
+        assertEquals(ResetLevel.CONFIRMED, state.level)
+        assertTrue(state.nextResetAt == null && state.nextResetKnownButUnparsed)
+    }
+
+    @Test fun canonicalDeadlineBecomesNextResetTime() {
+        val deadline = now.plusSeconds(7200)
+        val forecast = ForecastSnapshot(
+            calculatedAt = now,
+            validUntil = now.plusSeconds(3600),
+            publicationState = "high",
+            h24 = 12,
+            h48 = 34,
+            signalStage = null,
+            answerState = "confirmed",
+            answerDeadline = deadline
+        )
+
+        val state = ResetClassifier.build(forecast, emptyList(), now)
+
+        assertEquals(ResetLevel.CONFIRMED, state.level)
+        assertEquals(deadline, state.nextResetAt)
+        assertTrue(!state.nextResetKnownButUnparsed)
+    }
+
     @Test fun staleHidesProbability() {
         val forecast = ForecastSnapshot(now.minusSeconds(7200), now.minusSeconds(3600), "stale", 90, 95, null)
         val state = ResetClassifier.build(forecast, emptyList(), now)

@@ -22,14 +22,28 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/refresh"
+        <FrameLayout
             android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:gravity="center"
-            android:text="↻"
-            android:textColor="#C7CFDC"
-            android:textSize="16sp" />
+            android:layout_height="28dp">
+            <TextView
+                android:id="@+id/refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="↻"
+                android:textColor="#C7CFDC"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/refresh_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="正在刷新"
+                android:gravity="center"
+                android:text="⟳"
+                android:textColor="#D8DEEA"
+                android:textSize="17sp"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 
     <TextView
@@ -73,5 +87,15 @@
         android:text="上次：—"
         android:textColor="#778190"
         android:textSize="9sp" />
+
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Reset Beacon · 尚未同步"
+        android:textColor="#778190"
+        android:textSize="8sp" />
 
 </LinearLayout>

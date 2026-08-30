@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object WidgetScheduler {
@@ -29,7 +30,7 @@ object WidgetScheduler {
         )
     }
 
-    fun refreshNow(context: Context) {
+    fun refreshNow(context: Context): UUID {
         val request = OneTimeWorkRequestBuilder<RefreshWorker>()
             .setConstraints(constraints)
             .build()
@@ -38,6 +39,7 @@ object WidgetScheduler {
             ExistingWorkPolicy.REPLACE,
             request
         )
+        return request.id
     }
 
     fun stopPeriodic(context: Context) {
