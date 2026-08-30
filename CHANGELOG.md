@@ -9,4 +9,5 @@
 - Added parsing for the documented `answer.deadline` field when available.
 - Added MIT license, independence/trademark disclaimer, Reset Beacon attribution, and privacy notes.
 - Updated GitHub Actions checkout/setup-java actions to v5.
+- Updated the Gradle setup action to v6 to remove the Node.js 20 deprecation warning.
 - Bumped Android versionCode to 2 and versionName to 0.2.0.
