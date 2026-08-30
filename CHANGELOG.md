@@ -10,4 +10,5 @@
 - Added MIT license, independence/trademark disclaimer, Reset Beacon attribution, and privacy notes.
 - Updated GitHub Actions checkout/setup-java actions to v5.
 - Updated the Gradle setup action to v6 to remove the Node.js 20 deprecation warning.
+- Updated the artifact upload action to v6 for the same Node.js 24 runtime.
 - Bumped Android versionCode to 2 and versionName to 0.2.0.
