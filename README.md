@@ -4,125 +4,198 @@
 [![Android CI](https://github.com/JaynOwO/tibo-button/actions/workflows/build-apk.yml/badge.svg)](https://github.com/JaynOwO/tibo-button/actions/workflows/build-apk.yml)
 [![License](https://img.shields.io/github/license/JaynOwO/tibo-button)](LICENSE)
 
-Unofficial Android home-screen widgets for tracking public signals about extra shared Codex / ChatGPT Work usage-limit resets.
+[简体中文](#简体中文) · [English](#english)
 
-> **Independent project.** Tibo Button is not affiliated with, endorsed by, or an official product of OpenAI, X Corp., Reset Beacon / Sound Media, or Thibault “Tibo” Sottiaux.
+## 简体中文
 
-**Stable users:** [Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest).
+Tibo Button 是一个非官方 Android 应用和桌面 Widget，用于查看 Reset Beacon 提供的公开 Codex / ChatGPT Work 共享额度重置信号。
 
-## v0.3.1 (testing)
+> **独立项目声明：** 本项目与 OpenAI、ChatGPT、Codex、Reset Beacon、Sound Media 或 Thibault “Tibo” Sottiaux 没有隶属、赞助、认可或其他官方关系。
 
-- 4×2 and 2×2 Android widgets.
-- 24h / 48h Reset Beacon probabilities.
-- Last recorded broad reset.
-- Scheduled next reset and local-time countdown when a machine-readable deadline is available.
-- Manual refresh with an immediate, genuinely rotating refresh-arrow animation and “正在刷新…” feedback.
-- Optional Android notifications for:
-  - a confirmed/scheduled reset,
-  - a newly recorded completed reset,
-  - “very likely” status (off by default).
-- In-app detail view with Reset Beacon’s canonical answer text when available, plus a link to the strongest current evidence.
-- Reset Pulse: the seven most recent broad completed resets, a trailing 7-day count, recent average interval, and an explicitly defined cadence streak.
-- Secure in-app updater for future signed GitHub Releases; automatic checks never download or install by themselves.
-- 15-minute WorkManager refresh request; Android may defer background work for battery reasons.
-- Signed GitHub Release pipeline for installable, in-place-upgradable public APKs.
+### 当前稳定版：v0.3.1
 
-## Reset Pulse rules
+[下载 GitHub Releases 中的最新签名 APK](https://github.com/JaynOwO/tibo-button/releases/latest)
 
-Reset Pulse deliberately avoids fuzzy history math:
+### 功能概览
 
-- only Reset Beacon events marked `completed` are counted;
-- only broad/all-user scopes are counted;
-- the history card shows up to the latest seven qualifying events;
-- “7-day count” means qualifying events announced in the last seven days;
-- “recent streak” means the run starting at the newest event where every adjacent qualifying reset is no more than **72 hours** apart;
-- average interval is calculated across the displayed recent qualifying events.
+| 部分 | 内容 |
+| --- | --- |
+| App 详情页 | 当前重置状态、下次重置时间或来源说明、24h / 48h 概率、上次重置时间、数据来源和更新时间 |
+| Widget | 4×2 和 2×2 两种尺寸；状态、下次重置、概率、上次重置、近 7 天次数、来源和更新时间一目了然 |
+| Reset Pulse | 使用真实的最近最多 7 次已完成共享重置事件，计算近 7 天次数、平均间隔和近期连击 |
+| 刷新 | App 和 Widget 均提供立即刷新；刷新期间显示确定的 loading 状态和“正在刷新…”反馈 |
+| 通知 | scheduled / confirmed 和 completed reset 默认通知；“很可能”通知可选且默认关闭，并对相同事件去重 |
+| 更新器 | 只检查公开的稳定版 GitHub Release；下载和安装始终需要用户确认，并校验版本、包名、SHA-256 和签名 |
 
-These are descriptive activity metrics, not a promise that another reset will occur.
+### Widget 尺寸
 
-## Install
+- **4×2 Widget：** 显示 TIBO RESET RADAR、刷新入口、下次重置、确定性状态、24h / 48h 概率、上次重置、近 7 天次数、Reset Beacon 来源和更新时间。
+- **2×2 Widget：** 优先显示当前状态、下次重置、24h / 48h 概率和更新时间，避免在有限空间中塞入难以阅读的长文本。
 
-After the first signed release is published:
+Widget 使用不透明的深色 Surface 和稳定的 loading 状态切换，不依赖 Launcher 持续执行动画，也不会增加高频自刷新。
 
-1. Open the repository’s **Releases** page.
-2. Download `TiboButton-vX.Y.Z.apk`.
-3. Optionally verify it against `SHA256SUMS.txt`.
-4. Install the APK on Android and add either Tibo Button widget from the launcher’s widget picker.
+### Reset Pulse 统计规则
 
-Latest release:
+Reset Pulse 只做可解释的历史摘要，不承诺下一次重置时间：
 
-```text
-https://github.com/JaynOwO/tibo-button/releases/latest
-```
+- 只统计 Reset Beacon 标记为 completed 的事件；
+- 只统计 broad / all-user 范围的事件；
+- 最多展示最近 7 条符合条件的事件；
+- “近 7 天次数”指最近七天内公布的符合条件的事件数；
+- “近期连击”从最新事件开始计算，相邻事件间隔不超过 **72 小时**；
+- 平均间隔根据当前展示的符合条件事件计算；
+- 少于两条历史记录时显示明确的空状态，不绘制误导性趋势。
 
-Published release APKs are signed with one stable project key. Keep that installed release line separate from ad-hoc debug APKs, whose signatures can differ between build machines.
+### 安装
 
-## In-app updates
+1. 打开仓库的 [Releases](https://github.com/JaynOwO/tibo-button/releases) 页面。
+2. 下载 TiboButton-vX.Y.Z.apk，当前稳定版为 TiboButton-v0.3.1.apk。
+3. 可选：使用同一 Release 中的 SHA256SUMS.txt 校验文件完整性。
+4. 在 Android 上安装 APK，并在 Launcher 的 Widget 选择器中添加 Tibo Button。
 
-v0.3.1 is expected to be the final manual APK update. After a later signed release is published, the app can check the official public GitHub Release and offer a user-confirmed update.
+公开 Release APK 使用同一项目签名密钥，以便未来版本覆盖更新。Debug APK 是开发构建，可能无法覆盖由其他构建环境签名的 APK。
 
-Before Android's installer is opened, the updater requires all of the following:
+### 应用内更新
 
-- a stable `vX.Y.Z` release from `JaynOwO/tibo-button`;
-- the exact `TiboButton-vX.Y.Z.apk` asset;
-- a matching SHA-256 digest from the GitHub asset or `SHA256SUMS.txt`;
-- matching `com.tibobutton.app` package ID and versionName/versionCode;
-- a signing certificate matching the currently installed app.
+应用会检查 JaynOwO/tibo-button 的公开稳定版 GitHub Release，并只提供用户确认后的更新。自动检查不会自动下载或安装。
 
-The APK is kept in the app-private `cache/updates/` directory and handed to Android through a narrowly scoped FileProvider. Android's final installation confirmation always remains visible. If a check fails, the APK is deleted and installation stops. No GitHub login, token, or API key is required. Debug builds may correctly refuse to update a stable release because their signing certificate is intentionally different.
+在交给 Android 安装器前，更新器会验证：
 
-## Data source and attribution
+- 稳定的 vX.Y.Z Tag 和对应的精确 APK asset；
+- GitHub 提供的 SHA-256 及 SHA256SUMS.txt；
+- com.tibobutton.app 包名、versionName 和 versionCode；
+- 与已安装应用匹配的签名证书。
 
-The app reads Reset Beacon’s documented public JSON endpoints:
+下载文件仅保存于应用私有的 cache/updates/，并通过受限的 FileProvider 交给 Android。系统安装确认和未知来源权限流程始终保留。验证失败时会删除文件并停止安装；不需要 GitHub 登录、Token 或 API key。
 
-- `GET https://resetbeacon.com/api/forecast`
-- `GET https://resetbeacon.com/api/history`
+### 数据来源、准确性与隐私
 
-Reset Beacon’s terms permit reuse of its classification record with attribution and a link back, and describe its unauthenticated JSON API as suitable for dashboard/bot-style fair use. This app attributes Reset Beacon in the widget and links users back to the source/evidence.
+应用读取 Reset Beacon 的公开 JSON API：
 
-Archived or quoted public-post text remains the property of its original author. This repository does not claim ownership of that material.
+- GET https://resetbeacon.com/api/forecast
+- GET https://resetbeacon.com/api/history
 
-## Trademarks
+当来源没有可靠的机器可读截止时间时，应用不会从模糊文字推算精确时刻，而会明确显示“已排期 · 时间见来源”等说明。过期或不可用的预测会被标记，避免把旧概率伪装成当前数据。
 
-Codex, ChatGPT, and OpenAI are trademarks of OpenAI. They are referenced only to identify the subject being tracked. No OpenAI logo or other brand artwork is included.
+Reset Beacon 的数据只用于这个公开状态摘要，并在 App / Widget 中保留来源和回链。公开帖子引用或摘要仍归原作者所有；项目不会把完整帖子归为自己的内容。
 
-“Tibo” is used descriptively to identify the public source account whose reset-related announcements are being tracked. The project does not imply endorsement by Thibault Sottiaux.
+Tibo Button 不要求 OpenAI 登录、X 登录、API key，也不读取你的 Codex 使用量。Widget 状态、历史摘要、通知去重指纹和偏好设置保存在本地 Android 设备；网络请求仅访问 Reset Beacon 的公开 GET 接口。
 
-## Privacy
+### 开发构建
 
-Tibo Button does not ask for an OpenAI login, X login, API key, or your Codex usage data. Widget state, cached history summaries, notification dedup fingerprints, and notification preferences are stored locally on the Android device. The app makes public GET requests to Reset Beacon.
+仓库包含普通的 [Build Android APK workflow](.github/workflows/build-apk.yml)：
 
-## Development build
+1. 打开 **Actions → Build Android APK**。
+2. 运行 workflow。
+3. 下载 TiboButton-debug-apk artifact。
+4. 解压 app-debug.apk 后安装到 Android 设备。
 
-The repository includes `.github/workflows/build-apk.yml`.
+本地验证命令：
 
-1. Open **Actions** → **Build Android APK**.
+~~~bash
+gradle test
+gradle :app:assembleDebug
+~~~
+
+### 发布与许可
+
+签名发布流程见 [docs/RELEASING.md](docs/RELEASING.md)。发布签名凭据只保存在 GitHub Actions Secrets 中，不提交到仓库。
+
+源代码使用 [MIT License](LICENSE)。第三方服务、商标、公开帖子文字及其他第三方材料不由 MIT License 授权，详见 [NOTICE.md](NOTICE.md)。
+
+## English
+
+Tibo Button is an unofficial Android companion app and home-screen widget for viewing public Codex / ChatGPT Work shared-usage reset signals reported by Reset Beacon.
+
+> **Independent project:** This project is not affiliated with, sponsored by, endorsed by, or an official product of OpenAI, ChatGPT, Codex, Reset Beacon, Sound Media, or Thibault “Tibo” Sottiaux.
+
+### Current stable release: v0.3.1
+
+[Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest)
+
+### Feature overview
+
+| Area | Details |
+| --- | --- |
+| App details | Current reset status, next reset time or source wording, 24h / 48h probabilities, last reset, data source, and update time |
+| Widgets | 4×2 and 2×2 sizes with glanceable status, next reset, probabilities, last reset, trailing 7-day count, source, and update time |
+| Reset Pulse | Uses up to seven real recent completed shared-reset events to calculate a trailing 7-day count, average interval, and recent streak |
+| Refresh | Immediate refresh in the app and widgets with a deterministic loading state and “正在刷新…” feedback |
+| Notifications | Scheduled / confirmed and completed resets are enabled by default; “very likely” is optional and off by default, with event deduplication |
+| Updater | Checks only the public stable GitHub Release; download and installation always require user confirmation and verify version, package, SHA-256, and signing certificate |
+
+### Widget sizes
+
+- **4×2 widget:** TIBO RESET RADAR, refresh control, next reset, certainty status, 24h / 48h probabilities, last reset, trailing 7-day count, Reset Beacon source, and update time.
+- **2×2 widget:** Prioritizes current status, next reset, 24h / 48h probabilities, and update time so the compact layout remains readable.
+
+Widgets use an opaque dark surface and a deterministic loading-state swap. They do not depend on continuous launcher-side animation or add high-frequency background refreshes.
+
+### Reset Pulse rules
+
+Reset Pulse is an explainable activity summary, not a promise about the next reset:
+
+- only Reset Beacon events marked completed are counted;
+- only broad / all-user scopes are counted;
+- at most the latest seven qualifying events are shown;
+- “trailing 7-day count” means qualifying events announced during the last seven days;
+- “recent streak” starts at the newest event and continues while each adjacent event is no more than **72 hours** apart;
+- average interval is calculated across the displayed qualifying events;
+- fewer than two history records produce an explicit empty state rather than a misleading trend.
+
+### Install
+
+1. Open the repository’s [Releases](https://github.com/JaynOwO/tibo-button/releases) page.
+2. Download TiboButton-vX.Y.Z.apk; the current stable release is TiboButton-v0.3.1.apk.
+3. Optionally verify the file against SHA256SUMS.txt from the same Release.
+4. Install the APK on Android and add either Tibo Button widget from the Launcher widget picker.
+
+Public release APKs use one stable project signing key so future versions can upgrade an existing install. Debug APKs are development artifacts and may not upgrade over APKs signed by another build environment.
+
+### In-app updates
+
+The app checks the public stable GitHub Release for JaynOwO/tibo-button and offers only user-confirmed updates. Automatic checks never download or install an update by themselves.
+
+Before Android’s installer is opened, the updater verifies:
+
+- a stable vX.Y.Z tag and the exact APK asset;
+- the SHA-256 supplied by GitHub and SHA256SUMS.txt;
+- the com.tibobutton.app package ID, versionName, and versionCode;
+- a signing certificate matching the installed app.
+
+Downloads stay in the app-private cache/updates/ directory and are handed to Android through a narrowly scoped FileProvider. Android’s installation confirmation and unknown-source permission flow remain visible. If verification fails, the file is deleted and installation stops. No GitHub login, token, or API key is required.
+
+### Data source, accuracy, and privacy
+
+The app reads Reset Beacon’s public JSON API:
+
+- GET https://resetbeacon.com/api/forecast
+- GET https://resetbeacon.com/api/history
+
+When the source does not provide a reliable machine-readable deadline, the app does not infer an exact time from vague text; it shows wording such as “scheduled · see source for time.” Expired or unavailable forecasts are marked instead of presenting old probabilities as current.
+
+Reset Beacon data is used for this public status summary with attribution and a link back in the app and widgets. Quoted or summarized public-post text remains the property of its original author; this project does not claim ownership of full post archives.
+
+Tibo Button does not request an OpenAI login, X login, API key, or your Codex usage data. Widget state, history summaries, notification-deduplication fingerprints, and preferences stay on the local Android device; network requests are public GET requests to Reset Beacon.
+
+### Development build
+
+The repository includes the [Build Android APK workflow](.github/workflows/build-apk.yml):
+
+1. Open **Actions → Build Android APK**.
 2. Run the workflow.
-3. Download the `TiboButton-debug-apk` artifact.
-4. Extract `app-debug.apk` and install it on Android.
+3. Download the TiboButton-debug-apk artifact.
+4. Extract app-debug.apk and install it on Android.
 
-Debug builds are development artifacts and may not upgrade over builds signed elsewhere.
+Local verification commands:
 
-## Signed release process
+~~~bash
+gradle test
+gradle :app:assembleDebug
+~~~
 
-The signed release workflow is:
+### Release and license
 
-```text
-.github/workflows/release.yml
-```
+See [docs/RELEASING.md](docs/RELEASING.md) for the signed-release process. Signing credentials remain in GitHub Actions Secrets and are never committed.
 
-It can perform a manual dry run, or publish a GitHub Release when a matching `vX.Y.Z` tag is pushed. Signing credentials stay in GitHub Actions secrets and are never committed.
-
-See [docs/RELEASING.md](docs/RELEASING.md) for the one-time keystore setup, dry-run procedure, and release checklist.
-
-## Open-source publishing checklist
-
-Keep the non-affiliation notice visible, keep Reset Beacon attribution and source links, and avoid using OpenAI logos, Tibo’s portrait/avatar, or copied post archives as project branding.
-
-Recommended repository description:
-
-> Unofficial Android widgets for tracking public Codex / ChatGPT Work shared-reset signals from Reset Beacon.
-
-## License
-
-Source code in this repository is released under the [MIT License](LICENSE), except third-party material and trademarks, which remain subject to their respective owners’ rights. See [NOTICE.md](NOTICE.md).
+The source code is released under the [MIT License](LICENSE). Third-party services, trademarks, public-post text, and other third-party material are not licensed by the MIT License; see [NOTICE.md](NOTICE.md).

@@ -1,12 +1,28 @@
 # Changelog
 
-## 0.3.1 - Unreleased
+## 0.3.1 - 2026-08-31
 
-- Added a secure in-app updater for the official public `JaynOwO/tibo-button` stable GitHub Releases endpoint.
-- Added stable-tag, exact APK asset, SHA-256, package ID, version, and signing-certificate verification before handing an APK to Android's installer.
+### App UI and Widget
+
+- Promoted the dark, compact, information-first UI redesign to the stable release.
+- Made the current reset state the primary App detail and Widget content, with local-time timestamps, source attribution, and stale/unknown wording kept explicit.
+- Refined the 4×2 and 2×2 XML Widgets with a stable dark surface, clearer hierarchy, compact metrics, and a deterministic refresh loading state.
+- Preserved the immediate refresh flow and the “正在刷新…” feedback without depending on continuous Launcher-side animation.
+
+### Reset Pulse and notifications
+
+- Added the App-only Reset Pulse timeline using up to seven real recent broad completed reset events.
+- Added a trailing 7-day count, recent average interval, and explicitly defined recent cadence streak, including an accessible text summary and an empty state for insufficient history.
+- Added persistent notification fingerprints so the same scheduled/confirmed or completed reset is not re-alerted after metadata changes or process restarts.
+- Kept “very likely” notifications optional and disabled by default.
+
+### Updates and release safety
+
+- Added the secure in-app updater for the public JaynOwO/tibo-button stable GitHub Releases endpoint.
+- Added stable-tag, exact APK asset, SHA-256, package ID, version, and signing-certificate verification before handing an APK to Android’s installer.
 - Added app-private update caching, scoped FileProvider delivery, unknown-source permission handling, download progress, and explicit system installation confirmation.
-- Automatic update checks are opt-in by setting but enabled by default; automatic download and installation are never performed.
-- v0.3.1 includes the Reset Pulse and persistent notification deduplication work from the tested v0.3.0 development build.
+- Automatic update checks remain opt-in by setting but enabled by default; automatic download and installation are never performed.
+- Added the signed release workflow with tests, tag/version validation, APK signature verification, checksums, and GitHub Release assets.
 
 ## 0.3.0 - Development-only build
 
@@ -17,17 +33,17 @@
 - Added a compact 7-day reset count to the 4×2 widget without making the widget denser elsewhere.
 - Improved the notification settings copy to explain defaults and deduplication behavior.
 - Updated the public README with badges, Reset Pulse semantics, and direct stable-release discovery.
-- Bumped Android `versionCode` to 4 and `versionName` to 0.3.0.
+- Bumped Android versionCode to 4 and versionName to 0.3.0.
 
 ## 0.2.1 - 2026-08-30
 
 - Replaced the flipped loading glyph with a genuinely rotating refresh-arrow animation.
-- Implemented the widget animation with a supported indeterminate `ProgressBar` and level-driven `RotateDrawable`, avoiding rapid repeated widget updates.
+- Implemented the widget animation with a supported indeterminate ProgressBar and level-driven RotateDrawable, avoiding rapid repeated widget updates.
 - Added stable release-signing support through environment variables.
 - Added a GitHub Actions signed-release workflow with unit tests, tag/version validation, APK signature verification, SHA-256 checksums, and automatic GitHub Release assets.
 - Added a PowerShell helper for generating the one-time release keystore without placing passwords in source files.
 - Added release documentation and expanded public-repository secret protections.
-- Bumped Android `versionCode` to 3 and `versionName` to 0.2.1.
+- Bumped Android versionCode to 3 and versionName to 0.2.1.
 
 ## 0.2.0 - 2026-08-30
 
@@ -35,7 +51,7 @@
 - Added Android notification permission/settings UI.
 - Added optional notifications for confirmed schedules, newly completed broad resets, and very-likely status.
 - Added a richer in-app detail card with Reset Beacon canonical answer text and evidence link.
-- Added parsing for the documented `answer.deadline` field when available.
+- Added parsing for the documented answer.deadline field when available.
 - Added MIT license, independence/trademark disclaimer, Reset Beacon attribution, and privacy notes.
 - Updated GitHub Actions checkout/setup-java actions to v5.
 - Updated the Gradle setup action to v6 to remove the Node.js 20 deprecation warning.
