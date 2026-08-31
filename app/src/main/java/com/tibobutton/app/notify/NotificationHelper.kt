@@ -44,46 +44,59 @@ object NotificationHelper {
     }
 
     fun maybeNotify(context: Context, old: WidgetState, new: WidgetState) {
-        // First successful sync establishes a baseline. Do not replay an old alert on install.
-        if (old.updatedAt == null && old.lastResetAt == null) return
+        // First successful sync establishes a baseline. Do not replay historical alerts on install.
+        if (old.updatedAt == null && old.lastResetAt == null) {
+            NotificationPrefs.primeBaseline(context, new)
+            return
+        }
         if (!canNotify(context)) return
 
         val settings = NotificationPrefs.load(context)
 
-        // The first sync is suppressed above, but a later sync can legitimately
-        // discover the first completed event after earlier forecast-only data.
         val completedChanged = new.lastResetAt != null &&
             (old.lastResetAt == null || new.lastResetAt.isAfter(old.lastResetAt))
         if (completedChanged && settings.completed) {
-            send(
-                context,
-                2001,
-                "🔴 Tibo 按按钮了",
-                "Reset Beacon 记录到新的共享额度重置。Codex / ChatGPT Work 可以检查一下了。",
-                new.evidenceUrl
-            )
-            return
+            val fingerprint = new.lastResetAt.toString()
+            if (NotificationPrefs.lastCompletedFingerprint(context) != fingerprint) {
+                send(
+                    context,
+                    2001,
+                    "🔴 Tibo 按按钮了",
+                    "Reset Beacon 记录到新的共享额度重置。Codex / ChatGPT Work 可以检查一下了。",
+                    new.evidenceUrl
+                )
+                NotificationPrefs.markCompleted(context, fingerprint)
+                return
+            }
         }
 
         val scheduleChanged = new.level == ResetLevel.CONFIRMED && (
             old.level != ResetLevel.CONFIRMED ||
                 old.nextResetAt != new.nextResetAt ||
-                old.evidenceUrl != new.evidenceUrl
+                old.nextResetKnownButUnparsed != new.nextResetKnownButUnparsed
             )
         if (scheduleChanged && settings.confirmed) {
-            val whenText = new.nextResetAt?.atZone(ZoneId.systemDefault())
-                ?.format(DateTimeFormatter.ofPattern("M月d日 HH:mm"))
-                ?.let { "预计 $it" }
-                ?: "Reset Beacon 已记录明确排期"
-            send(context, 2002, "🟣 Tibo Reset 已确定", whenText, new.evidenceUrl)
-            return
+            val fingerprint = NotificationPrefs.confirmedFingerprint(new)
+            if (fingerprint != null && NotificationPrefs.lastConfirmedFingerprint(context) != fingerprint) {
+                val whenText = new.nextResetAt?.atZone(ZoneId.systemDefault())
+                    ?.format(DateTimeFormatter.ofPattern("M月d日 HH:mm"))
+                    ?.let { "预计 $it" }
+                    ?: "Reset Beacon 已记录明确排期"
+                send(context, 2002, "🟣 Tibo Reset 已确定", whenText, new.evidenceUrl)
+                NotificationPrefs.markConfirmed(context, fingerprint)
+                return
+            }
         }
 
         val becameLikely = new.level == ResetLevel.VERY_LIKELY &&
             old.level != ResetLevel.VERY_LIKELY && old.level != ResetLevel.CONFIRMED
         if (becameLikely && settings.likely) {
-            val p = new.h24?.let { "未来 24 小时 $it%" } ?: "未来 24 小时概率升高"
-            send(context, 2003, "🟠 Tibo Reset 很可能", p, new.evidenceUrl)
+            val fingerprint = NotificationPrefs.likelyFingerprint(new)
+            if (fingerprint != null && NotificationPrefs.lastLikelyFingerprint(context) != fingerprint) {
+                val p = new.h24?.let { "未来 24 小时 $it%" } ?: "未来 24 小时概率升高"
+                send(context, 2003, "🟠 Tibo Reset 很可能", p, new.evidenceUrl)
+                NotificationPrefs.markLikely(context, fingerprint)
+            }
         }
     }
 

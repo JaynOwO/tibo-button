@@ -26,6 +26,13 @@ data class HistoryEvent(
     val scheduledFor: Instant?
 )
 
+data class ResetHistoryItem(
+    val occurredAt: Instant,
+    val scope: String,
+    val summary: String,
+    val evidenceUrl: String?
+)
+
 enum class ResetLevel(val label: String, val emoji: String) {
     CONFIRMED("已确定", "🟣"),
     VERY_LIKELY("很可能", "🟠"),
@@ -47,6 +54,10 @@ data class WidgetState(
     val evidenceSummary: String? = null,
     val canonicalHeadline: String? = null,
     val canonicalSecondLine: String? = null,
+    val recentResets: List<ResetHistoryItem> = emptyList(),
+    val resetsLast7Days: Int = 0,
+    val averageIntervalHours: Long? = null,
+    val streakCount: Int = 0,
     val updatedAt: Instant? = null,
     val sourceStale: Boolean = false,
     val error: String? = null

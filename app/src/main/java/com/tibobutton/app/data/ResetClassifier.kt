@@ -4,6 +4,8 @@ import java.time.Duration
 import java.time.Instant
 
 object ResetClassifier {
+    private val streakGap = Duration.ofHours(72)
+
     fun build(
         forecast: ForecastSnapshot,
         history: List<HistoryEvent>,
@@ -12,12 +14,15 @@ object ResetClassifier {
         val stale = forecast.publicationState.equals("stale", ignoreCase = true) ||
             (forecast.validUntil?.isBefore(now) == true)
 
-        val lastCompleted = history
+        val completedBroad = history
             .asSequence()
             .filter { it.eventKind.equals("completed", true) }
             .filter { isBroadScope(it.scope) }
             .filter { it.announcedAt != null }
-            .maxByOrNull { it.announcedAt!! }
+            .sortedByDescending { it.announcedAt }
+            .toList()
+
+        val lastCompleted = completedBroad.firstOrNull()
 
         val activeSchedule = history
             .asSequence()
@@ -55,6 +60,23 @@ object ResetClassifier {
         }
 
         val primaryEvidence = activeSchedule ?: activeIntent ?: lastCompleted
+        val recentResets = completedBroad.take(7).map { event ->
+            ResetHistoryItem(
+                occurredAt = requireNotNull(event.announcedAt),
+                scope = event.scope,
+                summary = historySummary(event),
+                evidenceUrl = event.evidenceUrl
+            )
+        }
+        val sevenDaysAgo = now.minus(Duration.ofDays(7))
+        val resetsLast7Days = completedBroad.count { event ->
+            val at = event.announcedAt ?: return@count false
+            !at.isBefore(sevenDaysAgo) && !at.isAfter(now)
+        }
+        val intervals = recentResets.zipWithNext { newer, older ->
+            Duration.between(older.occurredAt, newer.occurredAt).toHours().coerceAtLeast(0)
+        }
+        val averageIntervalHours = intervals.takeIf { it.isNotEmpty() }?.average()?.toLong()
 
         return WidgetState(
             level = level,
@@ -64,12 +86,34 @@ object ResetClassifier {
             nextResetKnownButUnparsed = nextResetKnownButUnparsed,
             lastResetAt = lastCompleted?.announcedAt,
             evidenceUrl = primaryEvidence?.evidenceUrl,
-            evidenceSummary = null,
+            evidenceSummary = primaryEvidence?.let(::historySummary),
             canonicalHeadline = forecast.answerHeadline,
             canonicalSecondLine = forecast.answerSecondLine,
+            recentResets = recentResets,
+            resetsLast7Days = resetsLast7Days,
+            averageIntervalHours = averageIntervalHours,
+            streakCount = cadenceStreak(completedBroad),
             updatedAt = forecast.calculatedAt ?: now,
             sourceStale = stale
         )
+    }
+
+    private fun cadenceStreak(completedBroad: List<HistoryEvent>): Int {
+        if (completedBroad.isEmpty()) return 0
+        var streak = 1
+        for (i in 0 until completedBroad.lastIndex) {
+            val newer = completedBroad[i].announcedAt ?: break
+            val older = completedBroad[i + 1].announcedAt ?: break
+            val gap = Duration.between(older, newer)
+            if (gap.isNegative || gap > streakGap) break
+            streak++
+        }
+        return streak
+    }
+
+    private fun historySummary(event: HistoryEvent): String {
+        val raw = event.summary.ifBlank { event.operativeSentence }.ifBlank { "共享额度重置" }
+        return raw.replace(Regex("\\s+"), " ").trim().take(140)
     }
 
     private fun isBroadScope(scope: String): Boolean {

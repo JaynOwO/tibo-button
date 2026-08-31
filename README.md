@@ -1,10 +1,16 @@
 # ⚡ Tibo Button
 
+[![Latest release](https://img.shields.io/github/v/release/JaynOwO/tibo-button?display_name=tag)](https://github.com/JaynOwO/tibo-button/releases/latest)
+[![Android CI](https://github.com/JaynOwO/tibo-button/actions/workflows/build-apk.yml/badge.svg)](https://github.com/JaynOwO/tibo-button/actions/workflows/build-apk.yml)
+[![License](https://img.shields.io/github/license/JaynOwO/tibo-button)](LICENSE)
+
 Unofficial Android home-screen widgets for tracking public signals about extra shared Codex / ChatGPT Work usage-limit resets.
 
 > **Independent project.** Tibo Button is not affiliated with, endorsed by, or an official product of OpenAI, X Corp., Reset Beacon / Sound Media, or Thibault “Tibo” Sottiaux.
 
-## v0.2.1
+**Stable users:** [Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest).
+
+## v0.3.0 (testing)
 
 - 4×2 and 2×2 Android widgets.
 - 24h / 48h Reset Beacon probabilities.
@@ -16,8 +22,22 @@ Unofficial Android home-screen widgets for tracking public signals about extra s
   - a newly recorded completed reset,
   - “very likely” status (off by default).
 - In-app detail view with Reset Beacon’s canonical answer text when available, plus a link to the strongest current evidence.
+- Reset Pulse: the seven most recent broad completed resets, a trailing 7-day count, recent average interval, and an explicitly defined cadence streak.
 - 15-minute WorkManager refresh request; Android may defer background work for battery reasons.
 - Signed GitHub Release pipeline for installable, in-place-upgradable public APKs.
+
+## Reset Pulse rules
+
+Reset Pulse deliberately avoids fuzzy history math:
+
+- only Reset Beacon events marked `completed` are counted;
+- only broad/all-user scopes are counted;
+- the history card shows up to the latest seven qualifying events;
+- “7-day count” means qualifying events announced in the last seven days;
+- “recent streak” means the run starting at the newest event where every adjacent qualifying reset is no more than **72 hours** apart;
+- average interval is calculated across the displayed recent qualifying events.
+
+These are descriptive activity metrics, not a promise that another reset will occur.
 
 ## Install
 
@@ -55,7 +75,7 @@ Codex, ChatGPT, and OpenAI are trademarks of OpenAI. They are referenced only to
 
 ## Privacy
 
-Tibo Button does not ask for an OpenAI login, X login, API key, or your Codex usage data. Widget state and notification preferences are stored locally on the Android device. The app makes public GET requests to Reset Beacon.
+Tibo Button does not ask for an OpenAI login, X login, API key, or your Codex usage data. Widget state, cached history summaries, notification dedup fingerprints, and notification preferences are stored locally on the Android device. The app makes public GET requests to Reset Beacon.
 
 ## Development build
 

@@ -41,7 +41,8 @@ object WidgetRenderer {
             setTextColor(R.id.status_label, levelColor(state.level))
             setTextViewText(R.id.probability, probabilityText(state, wide = true))
             setTextViewText(R.id.next_time, nextText(state, short = false))
-            setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}")
+            val pulse = if (state.resetsLast7Days > 0) " · 7天 ${state.resetsLast7Days}次" else ""
+            setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}$pulse")
             setTextViewText(R.id.footer, if (refreshing) "Reset Beacon · 正在刷新…" else footerText(state))
             setViewVisibility(R.id.refresh, if (refreshing) View.GONE else View.VISIBLE)
             setViewVisibility(R.id.refresh_loading, if (refreshing) View.VISIBLE else View.GONE)
@@ -87,7 +88,6 @@ object WidgetRenderer {
                 context, 12, openSource,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            // Title remains an unobtrusive shortcut to the strongest available evidence.
             if (titleClickable) views.setOnClickPendingIntent(R.id.title, sourcePending)
         }
     }

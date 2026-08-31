@@ -78,4 +78,71 @@ class ResetClassifierTest {
         assertEquals(ResetLevel.STALE, state.level)
         assertTrue(state.h24 == null && state.h48 == null)
     }
+
+    @Test fun historyPulseUsesOnlyCompletedBroadResetsAndSortsNewestFirst() {
+        val forecast = ForecastSnapshot(now, now.plusSeconds(3600), "high", 10, 20, null)
+        val history = listOf(
+            completed(now.minusSeconds(6 * 3600L), "all", "Newest"),
+            completed(now.minusSeconds(30 * 3600L), "all_paid", "Second"),
+            completed(now.minusSeconds(60 * 3600L), "everyone", "Third"),
+            completed(now.minusSeconds(100 * 3600L), "all", "Fourth"),
+            completed(now.minusSeconds(12 * 3600L), "single_user", "Ignore narrow")
+        )
+
+        val state = ResetClassifier.build(forecast, history, now)
+
+        assertEquals(4, state.resetsLast7Days)
+        assertEquals(4, state.recentResets.size)
+        assertEquals("Newest", state.recentResets.first().summary)
+        assertEquals(4, state.streakCount)
+        assertEquals(31L, state.averageIntervalHours)
+    }
+
+    @Test fun cadenceStreakStopsAfterGapOver72Hours() {
+        val forecast = ForecastSnapshot(now, now.plusSeconds(3600), "high", 10, 20, null)
+        val history = listOf(
+            completed(now.minusSeconds(3 * 3600L), "all", "Newest"),
+            completed(now.minusSeconds(27 * 3600L), "all", "Second"),
+            completed(now.minusSeconds(110 * 3600L), "all", "Old break")
+        )
+
+        val state = ResetClassifier.build(forecast, history, now)
+
+        assertEquals(2, state.streakCount)
+    }
+
+    @Test fun cadenceStreakIncludesQualifyingEventsBeyondDisplayedSeven() {
+        val forecast = ForecastSnapshot(now, now.plusSeconds(3600), "high", 10, 20, null)
+        val history = (1..8).map { index ->
+            completed(now.minusSeconds(index * 24 * 3600L), "all", "Reset $index")
+        }
+
+        val state = ResetClassifier.build(forecast, history, now)
+
+        assertEquals(7, state.recentResets.size)
+        assertEquals(8, state.streakCount)
+    }
+
+    @Test fun sevenDayCountExcludesFutureEvents() {
+        val forecast = ForecastSnapshot(now, now.plusSeconds(3600), "high", 10, 20, null)
+        val history = listOf(
+            completed(now.plusSeconds(3600), "all", "Future"),
+            completed(now.minusSeconds(7 * 24 * 3600L), "all", "Boundary")
+        )
+
+        val state = ResetClassifier.build(forecast, history, now)
+
+        assertEquals(1, state.resetsLast7Days)
+    }
+
+    private fun completed(at: Instant, scope: String, summary: String) = HistoryEvent(
+        eventKind = "completed",
+        status = "completed",
+        scope = scope,
+        summary = summary,
+        operativeSentence = "",
+        evidenceUrl = "https://example.com/$summary",
+        announcedAt = at,
+        scheduledFor = null
+    )
 }

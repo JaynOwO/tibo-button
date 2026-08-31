@@ -17,7 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.work.WorkManager
 import com.tibobutton.app.data.NotificationPrefs
 import com.tibobutton.app.data.ResetApi
+import com.tibobutton.app.data.ResetLevel
 import com.tibobutton.app.data.WidgetPrefs
+import com.tibobutton.app.data.WidgetState
 import com.tibobutton.app.notify.NotificationHelper
 import com.tibobutton.app.work.WidgetScheduler
 import java.time.ZoneId
@@ -26,6 +28,7 @@ import java.time.format.DateTimeFormatter
 class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var evidenceText: TextView
+    private lateinit var historyText: TextView
     private lateinit var permissionStatus: TextView
     private lateinit var permissionButton: Button
     private lateinit var evidenceButton: Button
@@ -38,6 +41,7 @@ class MainActivity : Activity() {
 
         status = findViewById(R.id.status)
         evidenceText = findViewById(R.id.evidenceText)
+        historyText = findViewById(R.id.historyText)
         permissionStatus = findViewById(R.id.notificationPermissionStatus)
         permissionButton = findViewById(R.id.notificationPermissionButton)
         evidenceButton = findViewById(R.id.evidenceButton)
@@ -150,6 +154,7 @@ class MainActivity : Activity() {
                 }
             )
             append("\n更新：${s.updatedAt?.let(fmt::format) ?: "—"}")
+            append("\n\n${statusExplanation(s)}")
             if (s.error != null) append("\n\n⚠ ${s.error}\n当前显示上一次成功缓存。")
         }
 
@@ -165,6 +170,47 @@ class MainActivity : Activity() {
             }
         }
         evidenceButton.isEnabled = s.evidenceUrl != null
+        historyText.text = formatHistoryPulse(s, fmt)
+    }
+
+    private fun statusExplanation(state: WidgetState): String = when (state.level) {
+        ResetLevel.CONFIRMED -> if (state.nextResetAt != null) {
+            "说明：Reset Beacon 已给出明确排期；时间已换算为本机时区。"
+        } else {
+            "说明：已检测到明确排期/确认信号，但没有可靠的机器可读时间，因此不猜具体时刻。"
+        }
+        ResetLevel.VERY_LIKELY -> "说明：未来 24H 概率已达到 75% 或以上，但目前还没有明确排期。"
+        ResetLevel.POSSIBLE -> "说明：存在公开 intent 信号，或 24H 概率处于 45%–74%。"
+        ResetLevel.LOW -> "说明：24H 概率处于 20%–44%，暂时更像风声而不是按钮声。"
+        ResetLevel.UNLIKELY -> "说明：当前 24H 概率低于 20%，没有足够证据判断近期会重置。"
+        ResetLevel.STALE -> "说明：上游预测已过期；旧概率不会继续伪装成实时数据。"
+        ResetLevel.UNKNOWN -> "说明：尚未取得足够的有效预测数据。"
+    }
+
+    private fun formatHistoryPulse(state: WidgetState, fmt: DateTimeFormatter): String = buildString {
+        append("🔥 Reset Pulse\n\n")
+        append("近 7 天：${state.resetsLast7Days} 次")
+        if (state.streakCount > 0) append(" · 近期连击：${state.streakCount} 次（间隔≤72h）")
+        state.averageIntervalHours?.let { hours ->
+            append("\n最近记录平均间隔：${formatInterval(hours)}")
+        }
+        append("\n\n最近 ${state.recentResets.size.coerceAtMost(7)} 次已完成共享重置")
+        if (state.recentResets.isEmpty()) {
+            append("\n暂无可用历史记录。")
+        } else {
+            state.recentResets.forEachIndexed { index, item ->
+                append("\n${index + 1}. ${fmt.format(item.occurredAt)}")
+                if (item.summary.isNotBlank()) append(" · ${item.summary.take(64)}")
+            }
+        }
+        append("\n\n注：历史统计只计算 Reset Beacon 标记为 completed 且属于广泛/全体范围的事件。")
+    }
+
+    private fun formatInterval(hours: Long): String {
+        if (hours < 24) return "${hours} 小时"
+        val days = hours / 24
+        val remain = hours % 24
+        return if (remain == 0L) "${days} 天" else "${days} 天 ${remain} 小时"
     }
 
     companion object {

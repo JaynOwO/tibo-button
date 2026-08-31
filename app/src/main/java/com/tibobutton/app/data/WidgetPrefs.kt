@@ -1,6 +1,7 @@
 package com.tibobutton.app.data
 
 import android.content.Context
+import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 
@@ -20,6 +21,19 @@ object WidgetPrefs {
             putNullable("evidenceSummary", state.evidenceSummary)
             putNullable("canonicalHeadline", state.canonicalHeadline)
             putNullable("canonicalSecondLine", state.canonicalSecondLine)
+            put("recentResets", JSONArray().apply {
+                state.recentResets.forEach { item ->
+                    put(JSONObject().apply {
+                        put("occurredAt", item.occurredAt.toString())
+                        put("scope", item.scope)
+                        put("summary", item.summary)
+                        putNullable("evidenceUrl", item.evidenceUrl)
+                    })
+                }
+            })
+            put("resetsLast7Days", state.resetsLast7Days)
+            putNullable("averageIntervalHours", state.averageIntervalHours)
+            put("streakCount", state.streakCount)
             putNullable("updatedAt", state.updatedAt?.toString())
             put("sourceStale", state.sourceStale)
             putNullable("error", state.error)
@@ -44,11 +58,33 @@ object WidgetPrefs {
                 evidenceSummary = o.optNullableString("evidenceSummary"),
                 canonicalHeadline = o.optNullableString("canonicalHeadline"),
                 canonicalSecondLine = o.optNullableString("canonicalSecondLine"),
+                recentResets = o.optJSONArray("recentResets").toResetHistoryItems(),
+                resetsLast7Days = o.optInt("resetsLast7Days", 0),
+                averageIntervalHours = o.optNullableLong("averageIntervalHours"),
+                streakCount = o.optInt("streakCount", 0),
                 updatedAt = o.optInstant("updatedAt"),
                 sourceStale = o.optBoolean("sourceStale", false),
                 error = o.optNullableString("error")
             )
         }.getOrElse { WidgetState(error = "缓存读取失败") }
+    }
+}
+
+private fun JSONArray?.toResetHistoryItems(): List<ResetHistoryItem> {
+    this ?: return emptyList()
+    return buildList {
+        for (i in 0 until length()) {
+            val o = optJSONObject(i) ?: continue
+            val occurredAt = o.optInstant("occurredAt") ?: continue
+            add(
+                ResetHistoryItem(
+                    occurredAt = occurredAt,
+                    scope = o.optString("scope", ""),
+                    summary = o.optString("summary", "共享额度重置"),
+                    evidenceUrl = o.optNullableString("evidenceUrl")
+                )
+            )
+        }
     }
 }
 
@@ -59,5 +95,7 @@ private fun JSONObject.optNullableString(key: String): String? =
     if (!has(key) || isNull(key)) null else optString(key).takeIf { it.isNotBlank() }
 private fun JSONObject.optNullableInt(key: String): Int? =
     if (!has(key) || isNull(key)) null else runCatching { getInt(key) }.getOrNull()
+private fun JSONObject.optNullableLong(key: String): Long? =
+    if (!has(key) || isNull(key)) null else runCatching { getLong(key) }.getOrNull()
 private fun JSONObject.optInstant(key: String): Instant? =
     optNullableString(key)?.let { runCatching { Instant.parse(it) }.getOrNull() }

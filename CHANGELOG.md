@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 - Unreleased
+
+- Added **Reset Pulse** with the seven most recent broad completed reset records.
+- Added a trailing 7-day reset count, average recent reset interval, and an explicitly defined recent cadence streak (consecutive broad completed events no more than 72 hours apart).
+- Added plain-language status explanations for confirmed, likely, possible, low, unlikely, stale, and unknown states.
+- Added persistent notification fingerprints so the same confirmed/completed signal is not re-alerted just because evidence metadata changes or a process restarts.
+- Added a compact 7-day reset count to the 4×2 widget without making the widget denser elsewhere.
+- Improved the notification settings copy to explain defaults and deduplication behavior.
+- Updated the public README with badges, Reset Pulse semantics, and direct stable-release discovery.
+- Bumped Android `versionCode` to 4 and `versionName` to 0.3.0.
+
 ## 0.2.1 - 2026-08-30
 
 - Replaced the flipped loading glyph with a genuinely rotating refresh-arrow animation.
