@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.2 - Unreleased
+
+### Device experience
+
+- Improved App and Widget text resource usage and accessibility descriptions for status, refresh, source, loading, and cached-error states.
+- Reflowed App metadata and action controls so large system fonts do not force time fields or buttons into a crowded horizontal row.
+- Made the App-only Reset Pulse timeline scale its labels with the system font size while retaining the readable history summary.
+- Updated the 2×2 Widget to show both 24H and 48H probabilities when data is fresh, while stale data remains unavailable instead of reusing old percentages.
+- Added a Samsung / One UI device QA matrix for widget sizing, font scaling, refresh states, stale/offline states, notifications, and accessibility.
+
 ## 0.3.1 - 2026-08-31
 
 ### App UI and Widget

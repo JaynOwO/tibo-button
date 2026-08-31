@@ -16,6 +16,8 @@ Tibo Button 是一个非官方 Android 应用和桌面 Widget，用于查看 Res
 
 [下载 GitHub Releases 中的最新签名 APK](https://github.com/JaynOwO/tibo-button/releases/latest)
 
+> 当前 `main` 正在开发 v0.3.2，尚未发布新的稳定版 APK。设备体验验收清单见 [docs/DEVICE-QA.md](docs/DEVICE-QA.md)。
+
 ### 功能概览
 
 | 部分 | 内容 |
@@ -112,6 +114,8 @@ Tibo Button is an unofficial Android companion app and home-screen widget for vi
 ### Current stable release: v0.3.1
 
 [Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest)
+
+> The current `main` branch is developing v0.3.2; no new stable APK has been released. See [docs/DEVICE-QA.md](docs/DEVICE-QA.md) for the device experience checklist.
 
 ### Feature overview
 

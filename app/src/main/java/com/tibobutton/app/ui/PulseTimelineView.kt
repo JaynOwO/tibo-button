@@ -19,6 +19,7 @@ class PulseTimelineView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
     private var model = PulseTimelineModel(emptyList(), null)
     private val density = resources.displayMetrics.density
+    private val scaledDensity = resources.displayMetrics.scaledDensity
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.card_outline)
         strokeWidth = dp(2f)
@@ -35,13 +36,13 @@ class PulseTimelineView @JvmOverloads constructor(
     }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.text_secondary)
-        textSize = dp(10f)
+        textSize = sp(10f)
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
     }
     private val intervalPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.text_tertiary)
-        textSize = dp(9f)
+        textSize = sp(9f)
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
@@ -68,7 +69,15 @@ class PulseTimelineView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredHeight = dp(112f).roundToInt()
+        val labelBaselineGap = maxOf(dp(23f), labelPaint.textSize + dp(8f))
+        val timeBaselineGap = maxOf(
+            dp(38f),
+            labelBaselineGap + labelPaint.textSize + dp(5f)
+        )
+        val desiredHeight = maxOf(
+            dp(112f),
+            dp(51f) + timeBaselineGap + dp(12f)
+        ).roundToInt()
         val width = resolveSize(suggestedMinimumWidth, widthMeasureSpec)
         val height = resolveSize(desiredHeight, heightMeasureSpec)
         setMeasuredDimension(width, height)
@@ -82,7 +91,14 @@ class PulseTimelineView @JvmOverloads constructor(
         val left = dp(16f)
         val right = width - dp(16f)
         if (right <= left) return
-        val axisY = dp(51f).coerceAtMost(height - dp(36f))
+        val labelBaselineGap = maxOf(dp(23f), labelPaint.textSize + dp(8f))
+        val timeBaselineGap = maxOf(
+            dp(38f),
+            labelBaselineGap + labelPaint.textSize + dp(5f)
+        )
+        val intervalBaselineGap = maxOf(dp(13f), intervalPaint.textSize + dp(4f))
+        val axisY = minOf(dp(51f), height - timeBaselineGap - dp(12f))
+            .coerceAtLeast(dp(24f))
         val step = if (points.size == 1) 0f else (right - left) / (points.lastIndex.toFloat())
 
         if (points.size > 1) {
@@ -98,7 +114,12 @@ class PulseTimelineView @JvmOverloads constructor(
 
             point.intervalHours?.let { interval ->
                 val previousX = left + step * (index - 1)
-                canvas.drawText(formatDuration(interval), (previousX + x) / 2f, axisY - dp(13f), intervalPaint)
+                canvas.drawText(
+                    formatDuration(interval),
+                    (previousX + x) / 2f,
+                    axisY - intervalBaselineGap,
+                    intervalPaint
+                )
             }
         }
 
@@ -109,8 +130,8 @@ class PulseTimelineView @JvmOverloads constructor(
         labelIndices.forEach { index ->
             val x = if (points.size == 1) (left + right) / 2f else left + step * index
             val local = points[index].occurredAt.atZone(ZoneId.systemDefault())
-            canvas.drawText(local.format(dateFormatter), x, axisY + dp(23f), labelPaint)
-            canvas.drawText(local.format(timeFormatter), x, axisY + dp(38f), labelPaint)
+            canvas.drawText(local.format(dateFormatter), x, axisY + labelBaselineGap, labelPaint)
+            canvas.drawText(local.format(timeFormatter), x, axisY + timeBaselineGap, labelPaint)
         }
     }
 
@@ -121,4 +142,5 @@ class PulseTimelineView @JvmOverloads constructor(
     }
 
     private fun dp(value: Float): Float = value * density
+    private fun sp(value: Float): Float = value * scaledDensity
 }

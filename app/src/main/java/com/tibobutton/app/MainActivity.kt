@@ -121,7 +121,8 @@ class MainActivity : Activity() {
         refreshButton.setOnClickListener {
             refreshButton.isEnabled = false
             refreshLoading.visibility = View.VISIBLE
-            refreshButton.text = getString(R.string.refreshing) + "…"
+            refreshButton.text = getString(R.string.refreshing_with_ellipsis)
+            refreshButton.contentDescription = getString(R.string.refreshing)
             val workId = WidgetScheduler.refreshNow(this)
             val workInfo = WorkManager.getInstance(this).getWorkInfoById(workId)
             workInfo.addListener({
@@ -133,6 +134,7 @@ class MainActivity : Activity() {
                         refreshButton.isEnabled = true
                         refreshLoading.visibility = View.GONE
                         refreshButton.text = getString(R.string.refresh_now)
+                        refreshButton.contentDescription = getString(R.string.refresh_button_description)
                     }
                 }
             }, ContextCompat.getMainExecutor(this))
@@ -183,7 +185,7 @@ class MainActivity : Activity() {
                 startUpdateDownload()
             } else {
                 downloadUpdateButton.isEnabled = true
-                updateStatusText.text = "需要允许安装未知应用后，才能继续下载更新。"
+                updateStatusText.text = getString(R.string.update_permission_required)
             }
         }
     }
@@ -232,17 +234,30 @@ class MainActivity : Activity() {
         status.setTextColor(statusColor(s.level))
         nextResetText.text = when {
             s.nextResetAt != null -> fmt.format(s.nextResetAt)
-            s.nextResetKnownButUnparsed -> "已排期 · 时间见来源"
-            else -> "未知"
+            s.nextResetKnownButUnparsed -> getString(R.string.status_next_scheduled_unparsed)
+            else -> getString(R.string.status_next_unknown)
         }
-        h24Text.text = s.h24?.let { "$it%" } ?: "—"
-        h48Text.text = s.h48?.let { "$it%" } ?: "—"
-        lastResetText.text = "上次重置：${s.lastResetAt?.let(fmt::format) ?: "—"}"
-        updatedText.text = "数据更新：${s.updatedAt?.let(fmt::format) ?: "—"}"
+        h24Text.text = s.h24?.let { getString(R.string.percent_value, it) } ?: getString(R.string.not_available)
+        h48Text.text = s.h48?.let { getString(R.string.percent_value, it) } ?: getString(R.string.not_available)
+        lastResetText.text = getString(
+            R.string.last_reset_format,
+            s.lastResetAt?.let(fmt::format) ?: getString(R.string.not_available)
+        )
+        updatedText.text = getString(
+            R.string.updated_format,
+            s.updatedAt?.let(fmt::format) ?: getString(R.string.not_available)
+        )
         statusExplanationText.text = statusExplanation(s)
+        status.contentDescription = getString(
+            R.string.status_accessibility_format,
+            s.level.label,
+            nextResetText.text,
+            h24Text.text,
+            h48Text.text
+        )
         if (s.error != null) {
             statusErrorText.visibility = View.VISIBLE
-            statusErrorText.text = "⚠ ${s.error} · 当前显示上一次成功缓存"
+            statusErrorText.text = getString(R.string.status_error_cache_format, s.error)
         } else {
             statusErrorText.visibility = View.GONE
         }
@@ -250,7 +265,7 @@ class MainActivity : Activity() {
         evidenceText.text = buildString {
             val canonical = listOfNotNull(s.canonicalHeadline, s.canonicalSecondLine).joinToString("\n")
             if (canonical.isNotBlank()) {
-                append("Reset Beacon\n$canonical")
+                append(getString(R.string.evidence_reset_beacon_format, canonical))
             } else if (!s.evidenceSummary.isNullOrBlank()) {
                 append(s.evidenceSummary)
             } else {
@@ -263,7 +278,7 @@ class MainActivity : Activity() {
         pulseStatsText.text = getString(
             R.string.pulse_stats_format,
             s.resetsLast7Days,
-            pulseModel.averageIntervalHours?.let(::formatInterval) ?: "—",
+            pulseModel.averageIntervalHours?.let(::formatInterval) ?: getString(R.string.not_available),
             s.streakCount
         )
         pulseEmptyText.visibility = if (pulseModel.hasTimeline) View.GONE else View.VISIBLE
@@ -301,58 +316,58 @@ class MainActivity : Activity() {
         checkUpdateButton.isEnabled = false
         downloadUpdateButton.visibility = View.GONE
         releaseNotesText.visibility = View.GONE
-        updateStatusText.text = "正在检查 GitHub 最新稳定版…"
-        releaseNotesText.text = "Release notes：读取中…"
+        updateStatusText.text = getString(R.string.refresh_status_checking)
+        releaseNotesText.text = getString(R.string.release_notes_reading)
         val accepted = updateManager.checkLatest { result ->
             checkUpdateButton.isEnabled = true
             when (result) {
                 is UpdateCheckResult.Success -> showRelease(result.release)
                 is UpdateCheckResult.Failure -> {
                     latestRelease = null
-                    latestVersionText.text = "最新稳定版：检查失败"
-                    releaseNotesText.text = "Release notes：不可用"
+                    latestVersionText.text = getString(R.string.latest_version_check_failed)
+                    releaseNotesText.text = getString(R.string.release_notes_unavailable_short)
                     releaseNotesText.visibility = View.GONE
-                    updateStatusText.text = "检查更新失败：${result.message}"
+                    updateStatusText.text = getString(R.string.update_check_failed_format, result.message)
                     downloadUpdateButton.visibility = View.GONE
                 }
             }
         }
         if (!accepted) {
             checkUpdateButton.isEnabled = true
-            updateStatusText.text = "检查更新已在进行中。"
+            updateStatusText.text = getString(R.string.update_check_in_progress)
         }
     }
 
     private fun showRelease(release: StableRelease) {
         latestRelease = release
-        latestVersionText.text = "最新稳定版：v${release.version}"
+        latestVersionText.text = getString(R.string.latest_version_format, release.version)
 
         val installed = updateManager.installedVersion()
         when {
             installed == null -> {
-                updateStatusText.text = "当前安装版本无法按 vX.Y.Z 解析，已停止更新操作。"
+                updateStatusText.text = getString(R.string.installed_version_invalid)
                 downloadUpdateButton.visibility = View.GONE
                 releaseNotesText.visibility = View.GONE
             }
             release.version > installed -> {
-                updateStatusText.text = "发现稳定版更新，可在校验通过后交给系统安装器确认。"
+                updateStatusText.text = getString(R.string.update_available_status)
                 downloadUpdateButton.visibility = View.VISIBLE
                 downloadUpdateButton.isEnabled = true
                 downloadUpdateButton.text = getString(R.string.download_update)
                 releaseNotesText.text = if (release.notes.isBlank()) {
-                    "Release notes：暂无"
+                    getString(R.string.release_notes_empty)
                 } else {
-                    "Release notes\n${cleanReleaseNotes(release.notes)}"
+                    getString(R.string.release_notes_format, cleanReleaseNotes(release.notes))
                 }
                 releaseNotesText.visibility = View.VISIBLE
             }
             release.version == installed -> {
-                updateStatusText.text = "当前已是最新稳定版。"
+                updateStatusText.text = getString(R.string.update_latest_status)
                 downloadUpdateButton.visibility = View.GONE
                 releaseNotesText.visibility = View.GONE
             }
             else -> {
-                updateStatusText.text = "当前版本高于最新公开稳定版，处于开发/测试状态，不提供降级。"
+                updateStatusText.text = getString(R.string.update_downgrade_status)
                 downloadUpdateButton.visibility = View.GONE
                 releaseNotesText.visibility = View.GONE
             }
@@ -366,12 +381,12 @@ class MainActivity : Activity() {
 
     private fun startUpdateDownload() {
         val release = latestRelease ?: run {
-            updateStatusText.text = "请先检查最新稳定版。"
+            updateStatusText.text = getString(R.string.update_check_first)
             return
         }
         val installed = updateManager.installedVersion()
         if (installed == null || release.version <= installed) {
-            updateStatusText.text = "没有可用的更高稳定版更新。"
+            updateStatusText.text = getString(R.string.update_no_higher_version)
             downloadUpdateButton.visibility = View.GONE
             return
         }
@@ -379,7 +394,7 @@ class MainActivity : Activity() {
         if (!updateManager.canRequestPackageInstalls()) {
             pendingUpdateAfterPermission = true
             downloadUpdateButton.isEnabled = false
-            updateStatusText.text = "请允许 Tibo Button 安装未知应用；返回后将继续本次更新。"
+            updateStatusText.text = getString(R.string.update_unknown_sources)
             openUnknownSourcesSettings()
             return
         }
@@ -387,27 +402,35 @@ class MainActivity : Activity() {
         pendingUpdateAfterPermission = false
         downloadUpdateButton.isEnabled = false
         checkUpdateButton.isEnabled = false
-        updateStatusText.text = "准备下载 v${release.version}…"
+        updateStatusText.text = getString(R.string.update_prepare_download_format, release.version)
         val accepted = updateManager.downloadAndVerify(release) { result ->
             when (result) {
                 UpdateDownloadResult.NeedsUnknownSourcesPermission -> {
                     pendingUpdateAfterPermission = true
                     downloadUpdateButton.isEnabled = false
-                    updateStatusText.text = "请允许安装未知应用；返回后将继续本次更新。"
+                    updateStatusText.text = getString(R.string.update_unknown_sources_short)
                     openUnknownSourcesSettings()
                 }
                 is UpdateDownloadResult.Progress -> {
-                    val progress = if (result.percent >= 0) "${result.percent}%" else "…"
-                    downloadUpdateButton.text = "下载中 $progress"
-                    updateStatusText.text = "正在下载 v${release.version}：$progress"
+                    val progress = if (result.percent >= 0) {
+                        getString(R.string.percent_value, result.percent)
+                    } else {
+                        getString(R.string.unknown_progress)
+                    }
+                    downloadUpdateButton.text = getString(R.string.update_download_button_format, progress)
+                    updateStatusText.text = getString(
+                        R.string.update_download_status_format,
+                        release.version,
+                        progress
+                    )
                 }
                 UpdateDownloadResult.Verifying -> {
-                    downloadUpdateButton.text = "正在校验 APK…"
-                    updateStatusText.text = "正在校验 SHA-256、包名、版本和签名证书…"
+                    downloadUpdateButton.text = getString(R.string.update_verifying_button)
+                    updateStatusText.text = getString(R.string.update_verifying_status)
                 }
                 is UpdateDownloadResult.Verified -> {
-                    downloadUpdateButton.text = "已验证，打开安装器…"
-                    updateStatusText.text = "校验通过，请在系统安装界面确认更新。"
+                    downloadUpdateButton.text = getString(R.string.update_verified_button)
+                    updateStatusText.text = getString(R.string.update_verified_status)
                     runCatching {
                         val uri = updateManager.installerUri(result.apk)
                         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -417,23 +440,26 @@ class MainActivity : Activity() {
                         startActivity(intent)
                     }.onFailure {
                         downloadUpdateButton.isEnabled = true
-                        downloadUpdateButton.text = "下载并更新"
-                        updateStatusText.text = "无法打开系统安装器：${it.message ?: "未知错误"}"
+                        downloadUpdateButton.text = getString(R.string.download_update)
+                        updateStatusText.text = getString(
+                            R.string.update_installer_failed_format,
+                            it.message ?: getString(R.string.unknown_error)
+                        )
                     }
                 }
                 is UpdateDownloadResult.Failure -> {
                     checkUpdateButton.isEnabled = true
                     downloadUpdateButton.isEnabled = true
-                    downloadUpdateButton.text = "下载并更新"
-                    updateStatusText.text = "更新失败：${result.message}；已删除下载文件。"
+                    downloadUpdateButton.text = getString(R.string.download_update)
+                    updateStatusText.text = getString(R.string.update_failed_format, result.message)
                 }
             }
         }
         if (!accepted) {
             checkUpdateButton.isEnabled = true
             downloadUpdateButton.isEnabled = true
-            downloadUpdateButton.text = "下载并更新"
-            updateStatusText.text = "已有更新下载正在进行中。"
+            downloadUpdateButton.text = getString(R.string.download_update)
+            updateStatusText.text = getString(R.string.update_already_downloading)
         }
     }
 
@@ -445,22 +471,25 @@ class MainActivity : Activity() {
         runCatching { startActivity(intent) }.onFailure {
             pendingUpdateAfterPermission = false
             downloadUpdateButton.isEnabled = true
-            updateStatusText.text = "无法打开安装权限设置：${it.message ?: "未知错误"}"
+            updateStatusText.text = getString(
+                R.string.update_permission_settings_failed_format,
+                it.message ?: getString(R.string.unknown_error)
+            )
         }
     }
 
     private fun statusExplanation(state: WidgetState): String = when (state.level) {
         ResetLevel.CONFIRMED -> if (state.nextResetAt != null) {
-            "说明：Reset Beacon 已给出明确排期；时间已换算为本机时区。"
+            getString(R.string.status_explanation_confirmed_timed)
         } else {
-            "说明：已检测到明确排期/确认信号，但没有可靠的机器可读时间，因此不猜具体时刻。"
+            getString(R.string.status_explanation_confirmed_unparsed)
         }
-        ResetLevel.VERY_LIKELY -> "说明：未来 24H 概率已达到 75% 或以上，但目前还没有明确排期。"
-        ResetLevel.POSSIBLE -> "说明：存在公开 intent 信号，或 24H 概率处于 45%–74%。"
-        ResetLevel.LOW -> "说明：24H 概率处于 20%–44%，暂时更像风声而不是按钮声。"
-        ResetLevel.UNLIKELY -> "说明：当前 24H 概率低于 20%，没有足够证据判断近期会重置。"
-        ResetLevel.STALE -> "说明：上游预测已过期；旧概率不会继续伪装成实时数据。"
-        ResetLevel.UNKNOWN -> "说明：尚未取得足够的有效预测数据。"
+        ResetLevel.VERY_LIKELY -> getString(R.string.status_explanation_very_likely)
+        ResetLevel.POSSIBLE -> getString(R.string.status_explanation_possible)
+        ResetLevel.LOW -> getString(R.string.status_explanation_low)
+        ResetLevel.UNLIKELY -> getString(R.string.status_explanation_unlikely)
+        ResetLevel.STALE -> getString(R.string.status_explanation_stale)
+        ResetLevel.UNKNOWN -> getString(R.string.status_explanation_unknown)
     }
 
     private fun formatHistoryPulse(state: WidgetState, fmt: DateTimeFormatter): String = buildString {
@@ -469,17 +498,26 @@ class MainActivity : Activity() {
             append("\n${getString(R.string.pulse_history_empty)}")
         } else {
             state.recentResets.forEachIndexed { index, item ->
-                append("\n${index + 1}. ${fmt.format(item.occurredAt)}")
-                if (item.summary.isNotBlank()) append(" · ${item.summary.take(64)}")
+                val summary = item.summary.takeIf { it.isNotBlank() }?.take(64)
+                val itemText = if (summary == null) {
+                    getString(R.string.pulse_history_item_time_only, fmt.format(item.occurredAt))
+                } else {
+                    getString(R.string.pulse_history_item_format, fmt.format(item.occurredAt), summary)
+                }
+                append("\n${index + 1}. $itemText")
             }
         }
     }
 
     private fun formatInterval(hours: Long): String {
-        if (hours < 24) return "${hours} 小时"
+        if (hours < 24) return getString(R.string.duration_hours, hours)
         val days = hours / 24
         val remain = hours % 24
-        return if (remain == 0L) "${days} 天" else "${days} 天 ${remain} 小时"
+        return if (remain == 0L) {
+            getString(R.string.duration_days, days)
+        } else {
+            getString(R.string.duration_days_hours, days, remain)
+        }
     }
 
     companion object {

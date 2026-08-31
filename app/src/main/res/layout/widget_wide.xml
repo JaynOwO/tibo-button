@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="⚡ TIBO RESET RADAR"
+            android:text="@string/widget_title_wide"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -27,8 +27,7 @@
         <FrameLayout
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="@drawable/pill_bg"
-            android:contentDescription="@string/refresh">
+            android:background="@drawable/pill_bg">
 
             <ImageView
                 android:id="@+id/refresh"
@@ -73,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="下次重置"
+                android:text="@string/status_next_reset"
                 android:textColor="@color/text_tertiary"
                 android:textSize="11sp" />
 
@@ -82,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="等待首次刷新"
+                android:text="@string/status_waiting"
                 android:textColor="@color/text_primary"
                 android:textSize="21sp"
                 android:textStyle="bold"
@@ -94,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="⚪ 暂无数据"
+                android:text="@string/widget_status_unknown"
                 android:textColor="@color/status_unknown"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -113,7 +112,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="未来概率"
+                android:text="@string/widget_future_probability"
                 android:textColor="@color/text_tertiary"
                 android:textSize="11sp" />
 
@@ -122,7 +121,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="24H  —   48H  —"
+                android:text="@string/widget_probability_placeholder_wide"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:textStyle="bold"
@@ -134,7 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="上次：—"
+                android:text="@string/widget_last_placeholder"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp"
                 android:maxLines="2"
@@ -149,7 +148,7 @@
         android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Reset Beacon · 尚未同步"
+        android:text="@string/widget_footer_unsynced"
         android:textColor="@color/text_muted"
         android:textSize="10sp" />
 
