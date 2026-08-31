@@ -69,7 +69,7 @@ class ResetApi {
             connectTimeout = 10_000
             readTimeout = 12_000
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("User-Agent", "TiboButton/0.3 Android (+https://github.com/JaynOwO/tibo-button)")
+            setRequestProperty("User-Agent", "TiboButton/0.3.1 Android (+https://github.com/JaynOwO/tibo-button)")
             useCaches = false
         }
         return try {

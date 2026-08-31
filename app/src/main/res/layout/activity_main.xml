@@ -27,6 +27,83 @@
             android:textSize="15sp" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="⬆️ 应用更新"
+            android:textColor="#F5F7FA"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/installedVersionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="当前安装版本：读取中"
+            android:textColor="#AEB6C2"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/latestVersionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="最新稳定版：尚未检查"
+            android:textColor="#AEB6C2"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/updateStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="自动检查只读取公开 GitHub Release，不会自动下载或安装。"
+            android:textColor="#C8CFDA"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/releaseNotesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:maxLines="6"
+            android:ellipsize="end"
+            android:text="Release notes：尚未获取"
+            android:textColor="#7F8998"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/checkUpdateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="检查更新" />
+
+        <Button
+            android:id="@+id/downloadUpdateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="下载并更新"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/viewReleaseButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="查看 GitHub Release" />
+
+        <CheckBox
+            android:id="@+id/autoCheckUpdates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="打开 App 时自动检查稳定版更新"
+            android:textColor="#E5E9F0" />
+
+        <TextView
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

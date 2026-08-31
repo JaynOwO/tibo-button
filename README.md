@@ -10,7 +10,7 @@ Unofficial Android home-screen widgets for tracking public signals about extra s
 
 **Stable users:** [Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest).
 
-## v0.3.0 (testing)
+## v0.3.1 (testing)
 
 - 4×2 and 2×2 Android widgets.
 - 24h / 48h Reset Beacon probabilities.
@@ -23,6 +23,7 @@ Unofficial Android home-screen widgets for tracking public signals about extra s
   - “very likely” status (off by default).
 - In-app detail view with Reset Beacon’s canonical answer text when available, plus a link to the strongest current evidence.
 - Reset Pulse: the seven most recent broad completed resets, a trailing 7-day count, recent average interval, and an explicitly defined cadence streak.
+- Secure in-app updater for future signed GitHub Releases; automatic checks never download or install by themselves.
 - 15-minute WorkManager refresh request; Android may defer background work for battery reasons.
 - Signed GitHub Release pipeline for installable, in-place-upgradable public APKs.
 
@@ -55,6 +56,20 @@ https://github.com/JaynOwO/tibo-button/releases/latest
 ```
 
 Published release APKs are signed with one stable project key. Keep that installed release line separate from ad-hoc debug APKs, whose signatures can differ between build machines.
+
+## In-app updates
+
+v0.3.1 is expected to be the final manual APK update. After a later signed release is published, the app can check the official public GitHub Release and offer a user-confirmed update.
+
+Before Android's installer is opened, the updater requires all of the following:
+
+- a stable `vX.Y.Z` release from `JaynOwO/tibo-button`;
+- the exact `TiboButton-vX.Y.Z.apk` asset;
+- a matching SHA-256 digest from the GitHub asset or `SHA256SUMS.txt`;
+- matching `com.tibobutton.app` package ID and versionName/versionCode;
+- a signing certificate matching the currently installed app.
+
+The APK is kept in the app-private `cache/updates/` directory and handed to Android through a narrowly scoped FileProvider. Android's final installation confirmation always remains visible. If a check fails, the APK is deleted and installation stops. No GitHub login, token, or API key is required. Debug builds may correctly refuse to update a stable release because their signing certificate is intentionally different.
 
 ## Data source and attribution
 

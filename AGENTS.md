@@ -350,6 +350,19 @@ If proper public releases are introduced:
 - store signing secrets securely
 - generate signed release APK/AAB through CI only after the release process is explicitly configured
 
+## In-App Update Security
+
+The in-app updater may use only the official public `JaynOwO/tibo-button` stable GitHub Releases endpoint and assets.
+
+- Never put GitHub tokens, API keys, or other GitHub Secrets inside the APK.
+- Do not add an arbitrary remote update host; use HTTPS only.
+- Before opening Android's installer, validate the stable `vX.Y.Z` tag, exact APK asset name, SHA-256, package/applicationId, versionName/versionCode, and signing certificate against the currently installed app.
+- If any verification fails, delete the downloaded APK and stop. Never weaken a gate to make a test or build pass.
+- Store update APKs only in the app-private `cache/updates/` directory and expose them through a narrowly scoped, non-exported `FileProvider`.
+- Never silently install, bypass the system confirmation screen, or bypass Android's unknown-source permission flow.
+- Automatic checks may run when the app opens, but automatic download and installation are prohibited.
+- If Google Play distribution is ever considered, review the current `REQUEST_INSTALL_PACKAGES` policy before shipping.
+
 ---
 
 ## Performance / Battery

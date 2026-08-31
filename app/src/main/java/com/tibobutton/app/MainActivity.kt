@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
@@ -21,6 +22,11 @@ import com.tibobutton.app.data.ResetLevel
 import com.tibobutton.app.data.WidgetPrefs
 import com.tibobutton.app.data.WidgetState
 import com.tibobutton.app.notify.NotificationHelper
+import com.tibobutton.app.update.StableRelease
+import com.tibobutton.app.update.UpdateCheckResult
+import com.tibobutton.app.update.UpdateDownloadResult
+import com.tibobutton.app.update.UpdateManager
+import com.tibobutton.app.update.UpdatePrefs
 import com.tibobutton.app.work.WidgetScheduler
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -33,10 +39,21 @@ class MainActivity : Activity() {
     private lateinit var permissionButton: Button
     private lateinit var evidenceButton: Button
     private lateinit var refreshButton: Button
+    private lateinit var installedVersionText: TextView
+    private lateinit var latestVersionText: TextView
+    private lateinit var updateStatusText: TextView
+    private lateinit var releaseNotesText: TextView
+    private lateinit var checkUpdateButton: Button
+    private lateinit var downloadUpdateButton: Button
+    private lateinit var viewReleaseButton: Button
+    private lateinit var updateManager: UpdateManager
+    private var latestRelease: StableRelease? = null
+    private var pendingUpdateAfterPermission = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        updateManager = UpdateManager(this)
         NotificationHelper.ensureChannel(this)
 
         status = findViewById(R.id.status)
@@ -46,6 +63,20 @@ class MainActivity : Activity() {
         permissionButton = findViewById(R.id.notificationPermissionButton)
         evidenceButton = findViewById(R.id.evidenceButton)
         refreshButton = findViewById(R.id.refreshButton)
+        installedVersionText = findViewById(R.id.installedVersionText)
+        latestVersionText = findViewById(R.id.latestVersionText)
+        updateStatusText = findViewById(R.id.updateStatusText)
+        releaseNotesText = findViewById(R.id.releaseNotesText)
+        checkUpdateButton = findViewById(R.id.checkUpdateButton)
+        downloadUpdateButton = findViewById(R.id.downloadUpdateButton)
+        viewReleaseButton = findViewById(R.id.viewReleaseButton)
+        findViewById<CheckBox>(R.id.autoCheckUpdates).apply {
+            isChecked = UpdatePrefs.autoCheckEnabled(this@MainActivity)
+            setOnCheckedChangeListener { _, checked ->
+                UpdatePrefs.setAutoCheckEnabled(this@MainActivity, checked)
+            }
+        }
+        renderUpdateInitial()
 
         val settings = NotificationPrefs.load(this)
         findViewById<CheckBox>(R.id.notifyConfirmed).apply {
@@ -99,16 +130,38 @@ class MainActivity : Activity() {
             }
         }
 
+        checkUpdateButton.setOnClickListener { checkForUpdates() }
+        downloadUpdateButton.setOnClickListener { startUpdateDownload() }
+        viewReleaseButton.setOnClickListener {
+            val url = latestRelease?.htmlUrl ?: UpdateManager.LATEST_RELEASE_FALLBACK_URL
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }
+
         WidgetScheduler.ensurePeriodic(this)
         WidgetScheduler.refreshNow(this)
         renderCached()
         updateNotificationPermissionUi()
+        if (UpdatePrefs.autoCheckEnabled(this)) checkForUpdates()
     }
 
     override fun onResume() {
         super.onResume()
         renderCached()
         updateNotificationPermissionUi()
+        if (pendingUpdateAfterPermission) {
+            if (updateManager.canRequestPackageInstalls()) {
+                pendingUpdateAfterPermission = false
+                startUpdateDownload()
+            } else {
+                downloadUpdateButton.isEnabled = true
+                updateStatusText.text = "需要允许安装未知应用后，才能继续下载更新。"
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        updateManager.shutdown()
+        super.onDestroy()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -171,6 +224,156 @@ class MainActivity : Activity() {
         }
         evidenceButton.isEnabled = s.evidenceUrl != null
         historyText.text = formatHistoryPulse(s, fmt)
+    }
+
+    private fun renderUpdateInitial() {
+        installedVersionText.text = "当前安装版本：v${updateManager.installedVersionName()}"
+        latestVersionText.text = "最新稳定版：尚未检查"
+        updateStatusText.text = "自动检查只读取公开 GitHub Release，不会自动下载或安装。"
+        releaseNotesText.text = "Release notes：尚未获取"
+        downloadUpdateButton.visibility = View.GONE
+        viewReleaseButton.isEnabled = true
+    }
+
+    private fun checkForUpdates() {
+        checkUpdateButton.isEnabled = false
+        downloadUpdateButton.visibility = View.GONE
+        updateStatusText.text = "正在检查 GitHub 最新稳定版…"
+        releaseNotesText.text = "Release notes：读取中…"
+        val accepted = updateManager.checkLatest { result ->
+            checkUpdateButton.isEnabled = true
+            when (result) {
+                is UpdateCheckResult.Success -> showRelease(result.release)
+                is UpdateCheckResult.Failure -> {
+                    latestRelease = null
+                    latestVersionText.text = "最新稳定版：检查失败"
+                    releaseNotesText.text = "Release notes：不可用"
+                    updateStatusText.text = "检查更新失败：${result.message}"
+                    downloadUpdateButton.visibility = View.GONE
+                }
+            }
+        }
+        if (!accepted) {
+            checkUpdateButton.isEnabled = true
+            updateStatusText.text = "检查更新已在进行中。"
+        }
+    }
+
+    private fun showRelease(release: StableRelease) {
+        latestRelease = release
+        latestVersionText.text = "最新稳定版：v${release.version}"
+        releaseNotesText.text = if (release.notes.isBlank()) {
+            "Release notes：暂无"
+        } else {
+            "Release notes：\n${release.notes}"
+        }
+
+        val installed = updateManager.installedVersion()
+        when {
+            installed == null -> {
+                updateStatusText.text = "当前安装版本无法按 vX.Y.Z 解析，已停止更新操作。"
+                downloadUpdateButton.visibility = View.GONE
+            }
+            release.version > installed -> {
+                updateStatusText.text = "发现稳定版更新，可在校验通过后交给系统安装器确认。"
+                downloadUpdateButton.visibility = View.VISIBLE
+                downloadUpdateButton.isEnabled = true
+                downloadUpdateButton.text = "下载并更新"
+            }
+            release.version == installed -> {
+                updateStatusText.text = "当前已是最新稳定版。"
+                downloadUpdateButton.visibility = View.GONE
+            }
+            else -> {
+                updateStatusText.text = "当前版本高于最新公开稳定版，处于开发/测试状态，不提供降级。"
+                downloadUpdateButton.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun startUpdateDownload() {
+        val release = latestRelease ?: run {
+            updateStatusText.text = "请先检查最新稳定版。"
+            return
+        }
+        val installed = updateManager.installedVersion()
+        if (installed == null || release.version <= installed) {
+            updateStatusText.text = "没有可用的更高稳定版更新。"
+            downloadUpdateButton.visibility = View.GONE
+            return
+        }
+
+        if (!updateManager.canRequestPackageInstalls()) {
+            pendingUpdateAfterPermission = true
+            downloadUpdateButton.isEnabled = false
+            updateStatusText.text = "请允许 Tibo Button 安装未知应用；返回后将继续本次更新。"
+            openUnknownSourcesSettings()
+            return
+        }
+
+        pendingUpdateAfterPermission = false
+        downloadUpdateButton.isEnabled = false
+        checkUpdateButton.isEnabled = false
+        updateStatusText.text = "准备下载 v${release.version}…"
+        val accepted = updateManager.downloadAndVerify(release) { result ->
+            when (result) {
+                UpdateDownloadResult.NeedsUnknownSourcesPermission -> {
+                    pendingUpdateAfterPermission = true
+                    downloadUpdateButton.isEnabled = false
+                    updateStatusText.text = "请允许安装未知应用；返回后将继续本次更新。"
+                    openUnknownSourcesSettings()
+                }
+                is UpdateDownloadResult.Progress -> {
+                    val progress = if (result.percent >= 0) "${result.percent}%" else "…"
+                    downloadUpdateButton.text = "下载中 $progress"
+                    updateStatusText.text = "正在下载 v${release.version}：$progress"
+                }
+                UpdateDownloadResult.Verifying -> {
+                    downloadUpdateButton.text = "正在校验 APK…"
+                    updateStatusText.text = "正在校验 SHA-256、包名、版本和签名证书…"
+                }
+                is UpdateDownloadResult.Verified -> {
+                    downloadUpdateButton.text = "已验证，打开安装器…"
+                    updateStatusText.text = "校验通过，请在系统安装界面确认更新。"
+                    runCatching {
+                        val uri = updateManager.installerUri(result.apk)
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, "application/vnd.android.package-archive")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(intent)
+                    }.onFailure {
+                        downloadUpdateButton.isEnabled = true
+                        downloadUpdateButton.text = "下载并更新"
+                        updateStatusText.text = "无法打开系统安装器：${it.message ?: "未知错误"}"
+                    }
+                }
+                is UpdateDownloadResult.Failure -> {
+                    checkUpdateButton.isEnabled = true
+                    downloadUpdateButton.isEnabled = true
+                    downloadUpdateButton.text = "下载并更新"
+                    updateStatusText.text = "更新失败：${result.message}；已删除下载文件。"
+                }
+            }
+        }
+        if (!accepted) {
+            checkUpdateButton.isEnabled = true
+            downloadUpdateButton.isEnabled = true
+            downloadUpdateButton.text = "下载并更新"
+            updateStatusText.text = "已有更新下载正在进行中。"
+        }
+    }
+
+    private fun openUnknownSourcesSettings() {
+        val intent = Intent(
+            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+            Uri.parse("package:$packageName")
+        )
+        runCatching { startActivity(intent) }.onFailure {
+            pendingUpdateAfterPermission = false
+            downloadUpdateButton.isEnabled = true
+            updateStatusText.text = "无法打开安装权限设置：${it.message ?: "未知错误"}"
+        }
     }
 
     private fun statusExplanation(state: WidgetState): String = when (state.level) {

@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.3.0 - Unreleased
+## 0.3.1 - Unreleased
+
+- Added a secure in-app updater for the official public `JaynOwO/tibo-button` stable GitHub Releases endpoint.
+- Added stable-tag, exact APK asset, SHA-256, package ID, version, and signing-certificate verification before handing an APK to Android's installer.
+- Added app-private update caching, scoped FileProvider delivery, unknown-source permission handling, download progress, and explicit system installation confirmation.
+- Automatic update checks are opt-in by setting but enabled by default; automatic download and installation are never performed.
+- v0.3.1 includes the Reset Pulse and persistent notification deduplication work from the tested v0.3.0 development build.
+
+## 0.3.0 - Development-only build
 
 - Added **Reset Pulse** with the seven most recent broad completed reset records.
 - Added a trailing 7-day reset count, average recent reset interval, and an explicitly defined recent cadence streak (consecutive broad completed events no more than 72 hours apart).
