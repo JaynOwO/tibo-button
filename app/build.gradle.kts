@@ -3,6 +3,26 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val releaseStoreFilePath = System.getenv("TIBO_RELEASE_STORE_FILE")
+val releaseStorePassword = System.getenv("TIBO_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = System.getenv("TIBO_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("TIBO_RELEASE_KEY_PASSWORD")
+
+val releaseSigningValues = listOf(
+    releaseStoreFilePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+)
+val anyReleaseSigningValue = releaseSigningValues.any { !it.isNullOrBlank() }
+val hasReleaseSigning = releaseSigningValues.all { !it.isNullOrBlank() }
+
+check(!anyReleaseSigningValue || hasReleaseSigning) {
+    "Release signing variables must be provided together: " +
+        "TIBO_RELEASE_STORE_FILE, TIBO_RELEASE_STORE_PASSWORD, " +
+        "TIBO_RELEASE_KEY_ALIAS, and TIBO_RELEASE_KEY_PASSWORD."
+}
+
 android {
     namespace = "com.tibobutton.app"
     compileSdk = 35
@@ -11,17 +31,32 @@ android {
         applicationId = "com.tibobutton.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.2.1"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(requireNotNull(releaseStoreFilePath))
+                storePassword = requireNotNull(releaseStorePassword)
+                keyAlias = requireNotNull(releaseKeyAlias)
+                keyPassword = requireNotNull(releaseKeyPassword)
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 

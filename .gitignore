@@ -8,3 +8,12 @@
 .externalNativeBuild/
 .cxx/
 app/build/
+
+# Release signing material must never enter the public repository.
+*.jks
+*.keystore
+*.p12
+*.base64
+/keystore.properties
+/release-keystore.jks
+/dist/

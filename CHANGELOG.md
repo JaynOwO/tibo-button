@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1 - 2026-08-30
+
+- Replaced the flipped loading glyph with a genuinely rotating refresh-arrow animation.
+- Implemented the widget animation with a supported indeterminate `ProgressBar` and level-driven `RotateDrawable`, avoiding rapid repeated widget updates.
+- Added stable release-signing support through environment variables.
+- Added a GitHub Actions signed-release workflow with unit tests, tag/version validation, APK signature verification, SHA-256 checksums, and automatic GitHub Release assets.
+- Added a PowerShell helper for generating the one-time release keystore without placing passwords in source files.
+- Added release documentation and expanded public-repository secret protections.
+- Bumped Android `versionCode` to 3 and `versionName` to 0.2.1.
+
 ## 0.2.0 - 2026-08-30
 
 - Added immediate widget refresh feedback with a deterministic loading-state icon.

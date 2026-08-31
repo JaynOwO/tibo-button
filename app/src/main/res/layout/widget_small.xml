@@ -25,23 +25,29 @@
         <FrameLayout
             android:layout_width="28dp"
             android:layout_height="28dp">
-            <TextView
+
+            <ImageView
                 android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="↻"
-                android:textColor="#C7CFDC"
-                android:textSize="16sp" />
-            <TextView
+                android:contentDescription="@string/refresh"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_refresh" />
+
+            <ProgressBar
                 android:id="@+id/refresh_loading"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="正在刷新"
-                android:gravity="center"
-                android:text="⟳"
-                android:textColor="#D8DEEA"
-                android:textSize="17sp"
+                style="@android:style/Widget.ProgressBar.Small"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/refreshing"
+                android:indeterminate="true"
+                android:indeterminateBehavior="repeat"
+                android:indeterminateDrawable="@drawable/widget_refresh_spinner"
+                android:indeterminateDuration="720"
+                android:indeterminateOnly="true"
+                android:interpolator="@android:anim/linear_interpolator"
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
