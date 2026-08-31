@@ -5,10 +5,10 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.widget.RemoteViews
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.tibobutton.app.MainActivity
 import com.tibobutton.app.R
 import com.tibobutton.app.data.ResetLevel
@@ -37,13 +37,26 @@ object WidgetRenderer {
 
     private fun wideViews(context: Context, state: WidgetState, refreshing: Boolean): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_wide).apply {
-            setTextViewText(R.id.status_label, "${state.level.emoji} ${state.level.label}")
-            setTextColor(R.id.status_label, levelColor(state.level))
-            setTextViewText(R.id.probability, probabilityText(state, wide = true))
+            setTextViewText(
+                R.id.status_label,
+                context.getString(R.string.widget_status_format, state.level.emoji, state.level.label)
+            )
+            setTextColor(R.id.status_label, levelColor(context, state.level))
+            setTextViewText(R.id.probability, probabilityText(state, wide = true, context = context))
             setTextViewText(R.id.next_time, nextText(state, short = false))
-            val pulse = if (state.resetsLast7Days > 0) " · 7天 ${state.resetsLast7Days}次" else ""
-            setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}$pulse")
-            setTextViewText(R.id.footer, if (refreshing) "Reset Beacon · 正在刷新…" else footerText(state))
+            val last = formatWhen(state.lastResetAt)
+            setTextViewText(
+                R.id.last_reset,
+                if (state.resetsLast7Days > 0) {
+                    context.getString(R.string.widget_last_pulse_format, last, state.resetsLast7Days)
+                } else {
+                    context.getString(R.string.widget_last_format, last)
+                }
+            )
+            setTextViewText(
+                R.id.footer,
+                if (refreshing) context.getString(R.string.widget_footer_loading) else footerText(context, state)
+            )
             setViewVisibility(R.id.refresh, if (refreshing) View.GONE else View.VISIBLE)
             setViewVisibility(R.id.refresh_loading, if (refreshing) View.VISIBLE else View.GONE)
             wireClicks(context, this, state, titleClickable = true)
@@ -52,12 +65,24 @@ object WidgetRenderer {
 
     private fun smallViews(context: Context, state: WidgetState, refreshing: Boolean): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_small).apply {
-            setTextViewText(R.id.status_label, "${state.level.emoji} ${state.level.label}")
-            setTextColor(R.id.status_label, levelColor(state.level))
-            setTextViewText(R.id.probability, probabilityText(state, wide = false))
-            setTextViewText(R.id.next_time, "下次：${nextText(state, short = true)}")
-            setTextViewText(R.id.last_reset, "上次：${formatWhen(state.lastResetAt)}")
-            setTextViewText(R.id.footer, if (refreshing) "Reset Beacon · 正在刷新…" else footerText(state))
+            setTextViewText(
+                R.id.status_label,
+                context.getString(R.string.widget_status_format, state.level.emoji, state.level.label)
+            )
+            setTextColor(R.id.status_label, levelColor(context, state.level))
+            setTextViewText(R.id.probability, probabilityText(state, wide = false, context = context))
+            setTextViewText(
+                R.id.next_time,
+                context.getString(R.string.widget_next_format, nextText(state, short = true))
+            )
+            setTextViewText(
+                R.id.last_reset,
+                context.getString(R.string.widget_last_format, formatWhen(state.lastResetAt))
+            )
+            setTextViewText(
+                R.id.footer,
+                if (refreshing) context.getString(R.string.widget_footer_loading) else footerText(context, state)
+            )
             setViewVisibility(R.id.refresh, if (refreshing) View.GONE else View.VISIBLE)
             setViewVisibility(R.id.refresh_loading, if (refreshing) View.VISIBLE else View.GONE)
             wireClicks(context, this, state, titleClickable = false)
@@ -90,12 +115,6 @@ object WidgetRenderer {
             )
             if (titleClickable) views.setOnClickPendingIntent(R.id.title, sourcePending)
         }
-    }
-
-    private fun probabilityText(state: WidgetState, wide: Boolean): String {
-        val h24 = state.h24?.let { "$it%" } ?: "—"
-        val h48 = state.h48?.let { "$it%" } ?: "—"
-        return if (wide) "24H  $h24   48H  $h48" else "24H  $h24"
     }
 
     private fun nextText(state: WidgetState, short: Boolean): String {
@@ -131,7 +150,7 @@ object WidgetRenderer {
         return instant.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("M月d日 HH:mm"))
     }
 
-    private fun footerText(state: WidgetState): String {
+    private fun footerText(context: Context, state: WidgetState): String {
         val updated = state.updatedAt?.atZone(ZoneId.systemDefault())
             ?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "—"
         val suffix = when {
@@ -139,16 +158,25 @@ object WidgetRenderer {
             state.error != null -> " · ⚠ 刷新失败，显示缓存"
             else -> ""
         }
-        return "Reset Beacon · 更新 $updated$suffix"
+        return context.getString(R.string.widget_footer_format, updated, suffix)
     }
 
-    private fun levelColor(level: ResetLevel): Int = when (level) {
-        ResetLevel.CONFIRMED -> Color.rgb(184, 132, 255)
-        ResetLevel.VERY_LIKELY -> Color.rgb(255, 164, 78)
-        ResetLevel.POSSIBLE -> Color.rgb(255, 206, 84)
-        ResetLevel.LOW -> Color.rgb(112, 164, 255)
-        ResetLevel.UNLIKELY -> Color.rgb(174, 182, 194)
-        ResetLevel.STALE -> Color.rgb(255, 104, 104)
-        ResetLevel.UNKNOWN -> Color.rgb(174, 182, 194)
+    private fun probabilityText(state: WidgetState, wide: Boolean, context: Context): String {
+        val h24 = state.h24?.let { "$it%" } ?: "—"
+        val h48 = state.h48?.let { "$it%" } ?: "—"
+        return if (wide) {
+            context.getString(R.string.widget_probability_wide, h24, h48)
+        } else {
+            context.getString(R.string.widget_probability_small, h24)
+        }
     }
+
+    private fun levelColor(context: Context, level: ResetLevel): Int = ContextCompat.getColor(context, when (level) {
+        ResetLevel.CONFIRMED -> R.color.status_confirmed
+        ResetLevel.VERY_LIKELY -> R.color.status_likely
+        ResetLevel.POSSIBLE -> R.color.status_possible
+        ResetLevel.LOW -> R.color.status_low
+        ResetLevel.STALE -> R.color.status_stale
+        ResetLevel.UNLIKELY, ResetLevel.UNKNOWN -> R.color.status_unknown
+    })
 }

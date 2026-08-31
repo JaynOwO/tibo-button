@@ -12,9 +12,11 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.tibobutton.app.data.NotificationPrefs
 import com.tibobutton.app.data.ResetApi
@@ -22,6 +24,8 @@ import com.tibobutton.app.data.ResetLevel
 import com.tibobutton.app.data.WidgetPrefs
 import com.tibobutton.app.data.WidgetState
 import com.tibobutton.app.notify.NotificationHelper
+import com.tibobutton.app.ui.PulseTimelineModel
+import com.tibobutton.app.ui.PulseTimelineView
 import com.tibobutton.app.update.StableRelease
 import com.tibobutton.app.update.UpdateCheckResult
 import com.tibobutton.app.update.UpdateDownloadResult
@@ -33,12 +37,23 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : Activity() {
     private lateinit var status: TextView
+    private lateinit var nextResetText: TextView
+    private lateinit var h24Text: TextView
+    private lateinit var h48Text: TextView
+    private lateinit var lastResetText: TextView
+    private lateinit var updatedText: TextView
+    private lateinit var statusExplanationText: TextView
+    private lateinit var statusErrorText: TextView
     private lateinit var evidenceText: TextView
     private lateinit var historyText: TextView
+    private lateinit var pulseStatsText: TextView
+    private lateinit var pulseEmptyText: TextView
+    private lateinit var pulseTimeline: PulseTimelineView
     private lateinit var permissionStatus: TextView
     private lateinit var permissionButton: Button
     private lateinit var evidenceButton: Button
     private lateinit var refreshButton: Button
+    private lateinit var refreshLoading: ProgressBar
     private lateinit var installedVersionText: TextView
     private lateinit var latestVersionText: TextView
     private lateinit var updateStatusText: TextView
@@ -57,12 +72,23 @@ class MainActivity : Activity() {
         NotificationHelper.ensureChannel(this)
 
         status = findViewById(R.id.status)
+        nextResetText = findViewById(R.id.nextResetText)
+        h24Text = findViewById(R.id.h24Text)
+        h48Text = findViewById(R.id.h48Text)
+        lastResetText = findViewById(R.id.lastResetText)
+        updatedText = findViewById(R.id.updatedText)
+        statusExplanationText = findViewById(R.id.statusExplanationText)
+        statusErrorText = findViewById(R.id.statusErrorText)
         evidenceText = findViewById(R.id.evidenceText)
         historyText = findViewById(R.id.historyText)
+        pulseStatsText = findViewById(R.id.pulseStatsText)
+        pulseEmptyText = findViewById(R.id.pulseEmptyText)
+        pulseTimeline = findViewById(R.id.pulseTimeline)
         permissionStatus = findViewById(R.id.notificationPermissionStatus)
         permissionButton = findViewById(R.id.notificationPermissionButton)
         evidenceButton = findViewById(R.id.evidenceButton)
         refreshButton = findViewById(R.id.refreshButton)
+        refreshLoading = findViewById(R.id.refreshLoading)
         installedVersionText = findViewById(R.id.installedVersionText)
         latestVersionText = findViewById(R.id.latestVersionText)
         updateStatusText = findViewById(R.id.updateStatusText)
@@ -94,16 +120,19 @@ class MainActivity : Activity() {
 
         refreshButton.setOnClickListener {
             refreshButton.isEnabled = false
-            refreshButton.text = "正在刷新…"
+            refreshLoading.visibility = View.VISIBLE
+            refreshButton.text = getString(R.string.refreshing) + "…"
             val workId = WidgetScheduler.refreshNow(this)
             val workInfo = WorkManager.getInstance(this).getWorkInfoById(workId)
             workInfo.addListener({
                 val info = runCatching { workInfo.get() }.getOrNull()
-                if (info?.state?.isFinished == true) {
+                val retryScheduled = info?.state == WorkInfo.State.ENQUEUED && info.runAttemptCount > 0
+                if (info?.state?.isFinished == true || retryScheduled) {
                     runOnUiThread {
                         renderCached()
                         refreshButton.isEnabled = true
-                        refreshButton.text = "立即刷新"
+                        refreshLoading.visibility = View.GONE
+                        refreshButton.text = getString(R.string.refresh_now)
                     }
                 }
             }, ContextCompat.getMainExecutor(this))
@@ -123,9 +152,9 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.testNotificationButton).setOnClickListener {
             if (NotificationHelper.canNotify(this)) {
                 NotificationHelper.sendTest(this)
-                Toast.makeText(this, "测试通知已发送", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.test_notification_sent), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "先允许系统通知", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.enable_notifications_first), Toast.LENGTH_SHORT).show()
                 requestOrOpenNotificationSettings()
             }
         }
@@ -186,51 +215,84 @@ class MainActivity : Activity() {
         val enabled = if (Build.VERSION.SDK_INT >= 33 &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) false else getSystemService(NotificationManager::class.java).areNotificationsEnabled()
-        permissionStatus.text = if (enabled) "通知权限：✅ 已开启" else "通知权限：⚠ 未开启"
-        permissionButton.text = if (enabled) "打开通知设置" else "允许系统通知"
+        permissionStatus.text = getString(
+            if (enabled) R.string.notification_permission_enabled
+            else R.string.notification_permission_disabled
+        )
+        permissionButton.text = getString(
+            if (enabled) R.string.open_notification_settings
+            else R.string.allow_notifications
+        )
     }
 
     private fun renderCached() {
         val s = WidgetPrefs.load(this)
         val fmt = DateTimeFormatter.ofPattern("M月d日 HH:mm").withZone(ZoneId.systemDefault())
-        status.text = buildString {
-            append("${s.level.emoji} ${s.level.label}\n\n")
-            append("24H：${s.h24?.let { "$it%" } ?: "—"}\n")
-            append("48H：${s.h48?.let { "$it%" } ?: "—"}\n")
-            append("上次重置：${s.lastResetAt?.let(fmt::format) ?: "—"}\n")
-            append("下次重置：")
-            append(
-                when {
-                    s.nextResetAt != null -> fmt.format(s.nextResetAt)
-                    s.nextResetKnownButUnparsed -> "已排期，具体时间请点来源"
-                    else -> "未知"
-                }
-            )
-            append("\n更新：${s.updatedAt?.let(fmt::format) ?: "—"}")
-            append("\n\n${statusExplanation(s)}")
-            if (s.error != null) append("\n\n⚠ ${s.error}\n当前显示上一次成功缓存。")
+        status.text = "${s.level.emoji} ${s.level.label}"
+        status.setTextColor(statusColor(s.level))
+        nextResetText.text = when {
+            s.nextResetAt != null -> fmt.format(s.nextResetAt)
+            s.nextResetKnownButUnparsed -> "已排期 · 时间见来源"
+            else -> "未知"
+        }
+        h24Text.text = s.h24?.let { "$it%" } ?: "—"
+        h48Text.text = s.h48?.let { "$it%" } ?: "—"
+        lastResetText.text = "上次重置：${s.lastResetAt?.let(fmt::format) ?: "—"}"
+        updatedText.text = "数据更新：${s.updatedAt?.let(fmt::format) ?: "—"}"
+        statusExplanationText.text = statusExplanation(s)
+        if (s.error != null) {
+            statusErrorText.visibility = View.VISIBLE
+            statusErrorText.text = "⚠ ${s.error} · 当前显示上一次成功缓存"
+        } else {
+            statusErrorText.visibility = View.GONE
         }
 
         evidenceText.text = buildString {
-            append("当前依据\n\n")
             val canonical = listOfNotNull(s.canonicalHeadline, s.canonicalSecondLine).joinToString("\n")
             if (canonical.isNotBlank()) {
-                append("Reset Beacon：\n$canonical")
+                append("Reset Beacon\n$canonical")
             } else if (!s.evidenceSummary.isNullOrBlank()) {
                 append(s.evidenceSummary)
             } else {
-                append("暂无额外文字依据；可打开 Reset Beacon 查看当前记录。")
+                append(getString(R.string.source_unavailable))
             }
         }
         evidenceButton.isEnabled = s.evidenceUrl != null
+        val pulseModel = PulseTimelineModel.from(s)
+        pulseTimeline.setModel(pulseModel)
+        pulseStatsText.text = getString(
+            R.string.pulse_stats_format,
+            s.resetsLast7Days,
+            pulseModel.averageIntervalHours?.let(::formatInterval) ?: "—",
+            s.streakCount
+        )
+        pulseEmptyText.visibility = if (pulseModel.hasTimeline) View.GONE else View.VISIBLE
+        pulseEmptyText.text = if (pulseModel.points.isEmpty()) {
+            getString(R.string.pulse_empty_no_history)
+        } else {
+            getString(R.string.pulse_empty_one)
+        }
         historyText.text = formatHistoryPulse(s, fmt)
     }
 
+    private fun statusColor(level: ResetLevel): Int = ContextCompat.getColor(this, when (level) {
+        ResetLevel.CONFIRMED -> R.color.status_confirmed
+        ResetLevel.VERY_LIKELY -> R.color.status_likely
+        ResetLevel.POSSIBLE -> R.color.status_possible
+        ResetLevel.LOW -> R.color.status_low
+        ResetLevel.STALE -> R.color.status_stale
+        ResetLevel.UNLIKELY, ResetLevel.UNKNOWN -> R.color.status_unknown
+    })
+
     private fun renderUpdateInitial() {
-        installedVersionText.text = "当前安装版本：v${updateManager.installedVersionName()}"
-        latestVersionText.text = "最新稳定版：尚未检查"
-        updateStatusText.text = "自动检查只读取公开 GitHub Release，不会自动下载或安装。"
-        releaseNotesText.text = "Release notes：尚未获取"
+        installedVersionText.text = getString(
+            R.string.installed_version_format,
+            updateManager.installedVersionName()
+        )
+        latestVersionText.text = getString(R.string.latest_version_unchecked)
+        updateStatusText.text = getString(R.string.update_auto_check_hint)
+        releaseNotesText.text = getString(R.string.release_notes_unavailable)
+        releaseNotesText.visibility = View.GONE
         downloadUpdateButton.visibility = View.GONE
         viewReleaseButton.isEnabled = true
     }
@@ -238,6 +300,7 @@ class MainActivity : Activity() {
     private fun checkForUpdates() {
         checkUpdateButton.isEnabled = false
         downloadUpdateButton.visibility = View.GONE
+        releaseNotesText.visibility = View.GONE
         updateStatusText.text = "正在检查 GitHub 最新稳定版…"
         releaseNotesText.text = "Release notes：读取中…"
         val accepted = updateManager.checkLatest { result ->
@@ -248,6 +311,7 @@ class MainActivity : Activity() {
                     latestRelease = null
                     latestVersionText.text = "最新稳定版：检查失败"
                     releaseNotesText.text = "Release notes：不可用"
+                    releaseNotesText.visibility = View.GONE
                     updateStatusText.text = "检查更新失败：${result.message}"
                     downloadUpdateButton.visibility = View.GONE
                 }
@@ -262,34 +326,43 @@ class MainActivity : Activity() {
     private fun showRelease(release: StableRelease) {
         latestRelease = release
         latestVersionText.text = "最新稳定版：v${release.version}"
-        releaseNotesText.text = if (release.notes.isBlank()) {
-            "Release notes：暂无"
-        } else {
-            "Release notes：\n${release.notes}"
-        }
 
         val installed = updateManager.installedVersion()
         when {
             installed == null -> {
                 updateStatusText.text = "当前安装版本无法按 vX.Y.Z 解析，已停止更新操作。"
                 downloadUpdateButton.visibility = View.GONE
+                releaseNotesText.visibility = View.GONE
             }
             release.version > installed -> {
                 updateStatusText.text = "发现稳定版更新，可在校验通过后交给系统安装器确认。"
                 downloadUpdateButton.visibility = View.VISIBLE
                 downloadUpdateButton.isEnabled = true
-                downloadUpdateButton.text = "下载并更新"
+                downloadUpdateButton.text = getString(R.string.download_update)
+                releaseNotesText.text = if (release.notes.isBlank()) {
+                    "Release notes：暂无"
+                } else {
+                    "Release notes\n${cleanReleaseNotes(release.notes)}"
+                }
+                releaseNotesText.visibility = View.VISIBLE
             }
             release.version == installed -> {
                 updateStatusText.text = "当前已是最新稳定版。"
                 downloadUpdateButton.visibility = View.GONE
+                releaseNotesText.visibility = View.GONE
             }
             else -> {
                 updateStatusText.text = "当前版本高于最新公开稳定版，处于开发/测试状态，不提供降级。"
                 downloadUpdateButton.visibility = View.GONE
+                releaseNotesText.visibility = View.GONE
             }
         }
     }
+
+    private fun cleanReleaseNotes(notes: String): String = notes
+        .replace("**", "")
+        .replace(Regex("\\[([^]]+)]\\(([^)]+)\\)"), "$1")
+        .trim()
 
     private fun startUpdateDownload() {
         val release = latestRelease ?: run {
@@ -391,22 +464,15 @@ class MainActivity : Activity() {
     }
 
     private fun formatHistoryPulse(state: WidgetState, fmt: DateTimeFormatter): String = buildString {
-        append("🔥 Reset Pulse\n\n")
-        append("近 7 天：${state.resetsLast7Days} 次")
-        if (state.streakCount > 0) append(" · 近期连击：${state.streakCount} 次（间隔≤72h）")
-        state.averageIntervalHours?.let { hours ->
-            append("\n最近记录平均间隔：${formatInterval(hours)}")
-        }
-        append("\n\n最近 ${state.recentResets.size.coerceAtMost(7)} 次已完成共享重置")
+        append(getString(R.string.pulse_history_format, state.recentResets.size.coerceAtMost(7)))
         if (state.recentResets.isEmpty()) {
-            append("\n暂无可用历史记录。")
+            append("\n${getString(R.string.pulse_history_empty)}")
         } else {
             state.recentResets.forEachIndexed { index, item ->
                 append("\n${index + 1}. ${fmt.format(item.occurredAt)}")
                 if (item.summary.isNotBlank()) append(" · ${item.summary.take(64)}")
             }
         }
-        append("\n\n注：历史统计只计算 Reset Beacon 标记为 completed 且属于广泛/全体范围的事件。")
     }
 
     private fun formatInterval(hours: Long): String {

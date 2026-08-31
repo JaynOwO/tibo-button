@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="14dp"
+    android:padding="16dp"
     android:background="@drawable/widget_bg">
 
     <LinearLayout
@@ -19,29 +19,31 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="⚡ TIBO RESET RADAR"
-            android:textColor="#F7F8FB"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03" />
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/pill_bg">
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/pill_bg"
+            android:contentDescription="@string/refresh">
 
             <ImageView
                 android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/refresh"
-                android:padding="6dp"
+                android:padding="7dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_refresh" />
 
             <ProgressBar
                 android:id="@+id/refresh_loading"
                 style="@android:style/Widget.ProgressBar.Small"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_gravity="center"
                 android:contentDescription="@string/refreshing"
                 android:indeterminate="true"
@@ -58,74 +60,85 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.15"
+            android:layout_weight="1.1"
             android:orientation="vertical">
 
             <TextView
-                android:text="下次重置"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#8E98A8"
+                android:text="下次重置"
+                android:textColor="@color/text_tertiary"
                 android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/next_time"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="3dp"
                 android:text="等待首次刷新"
-                android:textColor="#F7F8FB"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textColor="@color/text_primary"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/status_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="5dp"
                 android:text="⚪ 暂无数据"
-                android:textColor="#AEB6C2"
-                android:textSize="12sp"
+                android:textColor="@color/status_unknown"
+                android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="14dp"
+            android:layout_height="1dp" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.85"
+            android:layout_weight="0.9"
             android:orientation="vertical">
 
             <TextView
-                android:text="未来概率"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#8E98A8"
+                android:text="未来概率"
+                android:textColor="@color/text_tertiary"
                 android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/probability"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="3dp"
                 android:text="24H  —   48H  —"
-                android:textColor="#F7F8FB"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/last_reset"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="7dp"
                 android:text="上次：—"
-                android:textColor="#AEB6C2"
-                android:textSize="11sp" />
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
         </LinearLayout>
     </LinearLayout>
 
@@ -133,10 +146,11 @@
         android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Reset Beacon · 尚未同步"
-        android:textColor="#778190"
-        android:textSize="9sp" />
+        android:textColor="@color/text_muted"
+        android:textSize="10sp" />
 
 </LinearLayout>

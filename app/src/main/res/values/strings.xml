@@ -4,4 +4,69 @@
     <string name="widget_description_small">Tibo 重置雷达 2×2</string>
     <string name="refresh">刷新</string>
     <string name="refreshing">正在刷新</string>
+    <string name="app_subtitle">Android 主屏幕上的共享额度重置雷达</string>
+    <string name="section_update">应用更新</string>
+    <string name="section_notifications">系统通知</string>
+    <string name="section_evidence">当前依据</string>
+    <string name="section_pulse">Reset Pulse · 最近 7 次</string>
+    <string name="section_about">关于与使用说明</string>
+    <string name="status_waiting">等待首次刷新…</string>
+    <string name="status_next_reset">下一次重置</string>
+    <string name="status_probability">未来概率</string>
+    <string name="status_last_reset">上次重置</string>
+    <string name="status_updated">数据更新</string>
+    <string name="status_source">Reset Beacon 数据源</string>
+    <string name="status_source_hint">结构化状态来自独立公共数据源；具体时间只在来源明确提供时显示。</string>
+    <string name="status_badge">RESET SIGNAL</string>
+    <string name="status_error_title">缓存状态</string>
+    <string name="refresh_now">立即刷新</string>
+    <string name="open_latest_evidence">打开最新依据</string>
+    <string name="open_reset_beacon">打开 Reset Beacon</string>
+    <string name="pulse_empty_no_history">暂无足够历史记录；同步两次已完成事件后显示时间线。</string>
+    <string name="pulse_empty_one">已记录 1 次；至少需要两次事件才能计算间隔。</string>
+    <string name="pulse_timeline_accessibility">时间线包含 %1$d 次重置记录，平均间隔 %2$s。</string>
+    <string name="pulse_stats_format">近 7 天 %1$d 次  ·  平均间隔 %2$s  ·  连击 %3$d 次</string>
+    <string name="pulse_history_empty">暂无可用历史记录。</string>
+    <string name="pulse_history_format">最近 %1$d 次已完成共享重置</string>
+    <string name="pulse_history_item_format">%1$s · %2$s</string>
+    <string name="pulse_history_item_time_only">%1$s</string>
+    <string name="pulse_disclaimer">仅统计 Reset Beacon 标记为 completed 且属于广泛/全体范围的事件。</string>
+    <string name="installed_version_format">当前安装版本：v%1$s</string>
+    <string name="latest_version_unchecked">最新稳定版：尚未检查</string>
+    <string name="update_auto_check_hint">自动检查只读取公开 GitHub Release，不会自动下载或安装。</string>
+    <string name="release_notes_unavailable">Release notes：尚未获取</string>
+    <string name="check_updates">检查更新</string>
+    <string name="download_update">下载并更新</string>
+    <string name="view_release">查看 GitHub Release</string>
+    <string name="auto_check_updates">打开 App 时自动检查稳定版更新</string>
+    <string name="notification_permission_checking">通知权限：检测中</string>
+    <string name="notification_summary">默认提醒明确排期和确认重置；相同事件会持久去重，避免后台刷新重复通知。</string>
+    <string name="allow_notifications">允许系统通知</string>
+    <string name="open_notification_settings">打开通知设置</string>
+    <string name="notify_confirmed">已确定排期时通知</string>
+    <string name="notify_completed">确认已重置时通知</string>
+    <string name="notify_likely">进入“很可能”时也通知（默认关闭）</string>
+    <string name="test_notification">发送测试通知</string>
+    <string name="about_body">添加小组件：长按桌面 → 小组件 → Tibo Button。
+
+后台刷新由 Android 调度，15 分钟是请求周期，不保证精确到分钟。Widget 上的刷新按钮可以随时强制刷新。
+
+Reset Pulse 的历史统计只计算 Reset Beacon 标记为 completed 且属于广泛/全体范围的重置；“近期连击”定义为从最近一次开始、相邻已完成重置间隔均不超过 72 小时的连续事件数。
+
+数据来自独立公共数据源 Reset Beacon。概率用于共享额外重置，不是你个人的 5 小时 / 周额度刷新时间。
+
+这是非官方独立项目，与 OpenAI、ChatGPT、Codex、Reset Beacon / Sound Media 或 Thibault “Tibo” Sottiaux 无隶属、赞助或认可关系。相关商标归其各自权利人所有。</string>
+    <string name="source_unavailable">暂无额外文字依据；可打开 Reset Beacon 查看当前记录。</string>
+    <string name="notification_permission_enabled">通知权限：✅ 已开启</string>
+    <string name="notification_permission_disabled">通知权限：⚠ 未开启</string>
+    <string name="test_notification_sent">测试通知已发送</string>
+    <string name="enable_notifications_first">先允许系统通知</string>
+    <string name="widget_status_format">%1$s %2$s</string>
+    <string name="widget_probability_wide">24H  %1$s   48H  %2$s</string>
+    <string name="widget_probability_small">24H  %1$s</string>
+    <string name="widget_next_format">下次：%1$s</string>
+    <string name="widget_last_format">上次：%1$s</string>
+    <string name="widget_last_pulse_format">上次：%1$s · 7天 %2$d次</string>
+    <string name="widget_footer_loading">Reset Beacon · 正在刷新…</string>
+    <string name="widget_footer_format">Reset Beacon · 更新 %1$s%2$s</string>
 </resources>

@@ -1,7 +1,29 @@
 <resources>
-    <color name="screen_bg">#0B0D12</color>
-    <color name="card_bg">#E6151820</color>
+    <color name="screen_bg">#080A0F</color>
+    <color name="screen_glow">#0D111A</color>
+    <color name="card_bg">#F0121720</color>
+    <color name="card_elevated">#FF171D29</color>
+    <color name="card_outline">#2C3848</color>
+    <color name="divider">#18212D</color>
     <color name="text_primary">#F5F7FA</color>
     <color name="text_secondary">#AEB6C2</color>
-    <color name="accent">#8EA2FF</color>
+    <color name="text_tertiary">#7F8998</color>
+    <color name="text_muted">#687384</color>
+    <color name="accent">#B58CFF</color>
+    <color name="accent_pressed">#C5A6FF</color>
+    <color name="accent_soft">#2EB58CFF</color>
+    <color name="button_primary_text_color">#140F1E</color>
+    <color name="button_secondary_bg">#FF171D27</color>
+    <color name="button_secondary_pressed">#FF242D3B</color>
+    <color name="button_disabled">#FF272D38</color>
+    <color name="status_confirmed">#C084FF</color>
+    <color name="status_likely">#FFB15C</color>
+    <color name="status_possible">#FFD166</color>
+    <color name="status_low">#8EAFFF</color>
+    <color name="status_stale">#FF7A7A</color>
+    <color name="status_unknown">#A5AFBF</color>
+    <color name="widget_surface">#F011151C</color>
+    <color name="widget_outline">#3AFFFFFF</color>
+    <color name="widget_action_bg">#2AFFFFFF</color>
+    <color name="refresh_icon">#E6EBF5</color>
 </resources>
