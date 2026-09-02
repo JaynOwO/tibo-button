@@ -1,6 +1,6 @@
 # Releasing Tibo Button
 
-This document describes the signed GitHub Release flow used for Tibo Button. The same process applies to each stable vX.Y.Z release; the examples below use v0.3.1.
+This document describes the signed GitHub Release flow used for Tibo Button. The same process applies to each stable vX.Y.Z release; the examples below use v0.3.2.
 
 A debug APK is useful for development, but public updates need a stable release-signing key. Every published APK must be signed with the same key so Android can install future versions over the existing app.
 
@@ -85,18 +85,18 @@ Inspect the full job and step logs. If the dry run fails, fix the root cause, pu
 After the normal CI and signed dry run are green, create an annotated tag from the verified final commit. The tag must exactly match v + Android versionName:
 
 ~~~bash
-git tag -a v0.3.1 -m "Tibo Button v0.3.1"
-git push origin v0.3.1
+git tag -a v0.3.2 -m "Tibo Button v0.3.2"
+git push origin v0.3.2
 ~~~
 
 The tag-triggered **Build signed release** workflow validates the tag/version match, rebuilds the APK with the configured release key, verifies its signature, writes the checksum file, and creates or updates the GitHub Release. A successful release contains:
 
 ~~~text
-TiboButton-v0.3.1.apk
+TiboButton-v0.3.2.apk
 SHA256SUMS.txt
 ~~~
 
-For another version, replace every 0.3.1 occurrence with the matching versionName; never reuse a published tag for a different build.
+For another version, replace every 0.3.2 occurrence with the matching versionName; never reuse a published tag for a different build.
 
 ## Post-release verification
 
@@ -113,7 +113,7 @@ Confirm all of the following on the published Release:
 Example checksum verification:
 
 ~~~powershell
-Get-FileHash .\TiboButton-v0.3.1.apk -Algorithm SHA256
+Get-FileHash .\TiboButton-v0.3.2.apk -Algorithm SHA256
 Get-Content .\SHA256SUMS.txt
 ~~~
 

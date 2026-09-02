@@ -12,11 +12,11 @@ Tibo Button 是一个非官方 Android 应用和桌面 Widget，用于查看 Res
 
 > **独立项目声明：** 本项目与 OpenAI、ChatGPT、Codex、Reset Beacon、Sound Media 或 Thibault “Tibo” Sottiaux 没有隶属、赞助、认可或其他官方关系。
 
-### 当前稳定版：v0.3.1
+### 当前稳定版：v0.3.2
 
 [下载 GitHub Releases 中的最新签名 APK](https://github.com/JaynOwO/tibo-button/releases/latest)
 
-> 当前 `main` 正在开发 v0.3.2，尚未发布新的稳定版 APK。设备体验验收清单见 [docs/DEVICE-QA.md](docs/DEVICE-QA.md)。
+> 当前 `main` 对应 v0.3.2 稳定版。设备体验验收清单见 [docs/DEVICE-QA.md](docs/DEVICE-QA.md)。
 
 ### 功能概览
 
@@ -53,7 +53,7 @@ Reset Pulse 只做可解释的历史摘要，不承诺下一次重置时间：
 ### 安装
 
 1. 打开仓库的 [Releases](https://github.com/JaynOwO/tibo-button/releases) 页面。
-2. 下载 TiboButton-vX.Y.Z.apk，当前稳定版为 TiboButton-v0.3.1.apk。
+2. 下载 TiboButton-vX.Y.Z.apk，当前稳定版为 TiboButton-v0.3.2.apk。
 3. 可选：使用同一 Release 中的 SHA256SUMS.txt 校验文件完整性。
 4. 在 Android 上安装 APK，并在 Launcher 的 Widget 选择器中选择 Tibo Button 的任意一种布局。
 
@@ -113,11 +113,11 @@ Tibo Button is an unofficial Android companion app and home-screen widget for vi
 
 > **Independent project:** This project is not affiliated with, sponsored by, endorsed by, or an official product of OpenAI, ChatGPT, Codex, Reset Beacon, Sound Media, or Thibault “Tibo” Sottiaux.
 
-### Current stable release: v0.3.1
+### Current stable release: v0.3.2
 
 [Download the latest signed APK from GitHub Releases](https://github.com/JaynOwO/tibo-button/releases/latest)
 
-> The current `main` branch is developing v0.3.2; no new stable APK has been released. See [docs/DEVICE-QA.md](docs/DEVICE-QA.md) for the device experience checklist.
+> The current `main` branch corresponds to the v0.3.2 stable release. See [docs/DEVICE-QA.md](docs/DEVICE-QA.md) for the device experience checklist.
 
 ### Feature overview
 
@@ -154,7 +154,7 @@ Reset Pulse is an explainable activity summary, not a promise about the next res
 ### Install
 
 1. Open the repository’s [Releases](https://github.com/JaynOwO/tibo-button/releases) page.
-2. Download TiboButton-vX.Y.Z.apk; the current stable release is TiboButton-v0.3.1.apk.
+2. Download TiboButton-vX.Y.Z.apk; the current stable release is TiboButton-v0.3.2.apk.
 3. Optionally verify the file against SHA256SUMS.txt from the same Release.
 4. Install the APK on Android and choose any Tibo Button layout from the Launcher widget picker.
 
