@@ -26,6 +26,7 @@ This checklist covers the device-level behavior that cannot be proven by the JVM
 - No data: show an explicit unknown state without invented time or probability.
 - Offline refresh failure: retain the last successful cache, show the failure indication, and keep the source/update time understandable.
 - Widget refresh: test all four variants, tap the refresh control and verify the deterministic loading icon plus `正在刷新…`; tap again while loading and verify there is no visible duplicate animation or broken layout; confirm normal state returns after success or failure.
+- Widget installation: add each 4×2 variant and confirm One UI does not show `无法添加微件` / `Unable to add widget`; the 2×2 variant must remain addable as a control comparison.
 - App refresh: verify the button disables immediately, shows loading feedback, and returns to the normal label after WorkManager finishes or retries.
 - Notifications: verify permission/settings behavior, scheduled/confirmed and completed notifications, optional likely notifications, and no repeated notification for the same event.
 - Accessibility: use TalkBack or the device accessibility inspector and verify the status summary, refresh action, loading state, Pulse Orb status core, Command Deck probability metrics, Pulse summary, and source action have meaningful descriptions.

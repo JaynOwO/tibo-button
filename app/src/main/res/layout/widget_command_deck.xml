@@ -102,14 +102,11 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <Space
-            android:layout_width="@dimen/widget_orb_gap"
-            android:layout_height="1dp" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.88"
+            android:layout_marginStart="@dimen/widget_orb_gap"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -138,14 +135,11 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <Space
-                android:layout_width="@dimen/widget_metric_gap"
-                android:layout_height="1dp" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="@dimen/widget_metric_gap"
                 android:background="@drawable/widget_deck_metric"
                 android:orientation="vertical"
                 android:padding="@dimen/widget_metric_padding">

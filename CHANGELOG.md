@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.3 - Unreleased
+
+### Widget compatibility
+
+- Replaced `Space` gaps in all 4×2 RemoteViews layouts with standard layout margins to improve Samsung / One UI widget-host compatibility without changing widget content or refresh behavior.
+- Kept the 2×2 layout, WidgetState data contract, provider registrations, and refresh pipeline unchanged.
+
 ## 0.3.2 - 2026-09-02
 
 ### Device experience
