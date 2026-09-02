@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="@dimen/widget_padding"
     android:background="@drawable/widget_bg">
 
     <LinearLayout
@@ -18,11 +18,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/widget_title_wide"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/widget_title_pulse_orb"
             android:textColor="@color/text_primary"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:letterSpacing="0.03" />
+            android:letterSpacing="0.06" />
 
         <FrameLayout
             android:id="@+id/refresh_hit"
@@ -35,7 +37,7 @@
                 android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="7dp"
+                android:padding="10dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_refresh" />
 
@@ -60,97 +62,97 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/small_gap"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.1"
-            android:orientation="vertical">
+        <FrameLayout
+            android:layout_width="@dimen/widget_orb_size"
+            android:layout_height="@dimen/widget_orb_size"
+            android:background="@drawable/widget_orb_halo">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_next_reset"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp" />
-
-            <TextView
-                android:id="@+id/next_time"
+            <ImageView
+                android:id="@+id/status_orb"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="@string/status_waiting"
-                android:textColor="@color/text_primary"
-                android:textSize="21sp"
-                android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/status_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/widget_status_unknown"
-                android:textColor="@color/status_unknown"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:contentDescription="@string/widget_orb_accessibility_placeholder"
+                android:padding="8dp"
+                android:src="@drawable/widget_orb_core" />
+        </FrameLayout>
 
         <Space
-            android:layout_width="14dp"
+            android:layout_width="@dimen/widget_orb_gap"
             android:layout_height="1dp" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.9"
+            android:layout_weight="1"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/status_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_status_unknown"
+                android:textColor="@color/status_unknown"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/widget_future_probability"
+                android:layout_marginTop="2dp"
+                android:text="@string/widget_orb_next_label"
                 android:textColor="@color/text_tertiary"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/next_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@string/widget_next_placeholder"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/probability"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="@string/widget_probability_placeholder_wide"
-                android:textColor="@color/text_primary"
-                android:textSize="17sp"
-                android:textStyle="bold"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/last_reset"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:text="@string/widget_last_placeholder"
+                android:text="@string/widget_probability_placeholder_small"
                 android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:maxLines="2"
-                android:ellipsize="end" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/last_reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/widget_last_placeholder"
+        android:textColor="@color/text_secondary"
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/widget_footer_unsynced"
         android:textColor="@color/text_muted"
-        android:textSize="10sp" />
+        android:textSize="9sp" />
 
 </LinearLayout>

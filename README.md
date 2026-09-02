@@ -23,18 +23,20 @@ Tibo Button 是一个非官方 Android 应用和桌面 Widget，用于查看 Res
 | 部分 | 内容 |
 | --- | --- |
 | App 详情页 | 当前重置状态、下次重置时间或来源说明、24h / 48h 概率、上次重置时间、数据来源和更新时间 |
-| Widget | 4×2 和 2×2 两种尺寸；状态、下次重置、概率、上次重置、近 7 天次数、来源和更新时间一目了然 |
+| Widget | 四种选择：标准 4×2、标准 2×2、Pulse Orb 脉冲核心和 Command Deck 指挥台；均显示真实状态与更新时间 |
 | Reset Pulse | 使用真实的最近最多 7 次已完成共享重置事件，计算近 7 天次数、平均间隔和近期连击 |
 | 刷新 | App 和 Widget 均提供立即刷新；刷新期间显示确定的 loading 状态和“正在刷新…”反馈 |
 | 通知 | scheduled / confirmed 和 completed reset 默认通知；“很可能”通知可选且默认关闭，并对相同事件去重 |
 | 更新器 | 只检查公开的稳定版 GitHub Release；下载和安装始终需要用户确认，并校验版本、包名、SHA-256 和签名 |
 
-### Widget 尺寸
+### Widget 选择
 
-- **4×2 Widget：** 显示 TIBO RESET RADAR、刷新入口、下次重置、确定性状态、24h / 48h 概率、上次重置、近 7 天次数、Reset Beacon 来源和更新时间。
-- **2×2 Widget：** 优先显示当前状态、下次重置、24h / 48h 概率和更新时间，避免在有限空间中塞入难以阅读的长文本。
+- **标准 4×2：** 显示 TIBO RESET RADAR、刷新入口、下次重置、确定性状态、24h / 48h 概率、上次重置、近 7 天次数、Reset Beacon 来源和更新时间。
+- **标准 2×2：** 优先显示当前状态、下次重置、24h / 48h 概率和更新时间，避免在有限空间中塞入难以阅读的长文本。
+- **Pulse Orb · 脉冲核心：** 用静态状态光环突出当前信号，同时保留下次重置、24h / 48h 概率、上次重置和来源更新时间。
+- **Command Deck · 指挥台：** 使用紧凑的控制台布局突出下次重置，并列显示 24h / 48h 概率、上次重置和近 7 天统计。
 
-Widget 使用不透明的深色 Surface 和稳定的 loading 状态切换，不依赖 Launcher 持续执行动画，也不会增加高频自刷新。
+四种 Widget 都使用不透明的深色 Surface 和稳定的 loading 状态切换，不依赖 Launcher 持续执行动画，也不会增加高频自刷新。Pulse Orb 的光环只表达当前状态颜色，不代表额外预测数据。
 
 ### Reset Pulse 统计规则
 
@@ -53,7 +55,7 @@ Reset Pulse 只做可解释的历史摘要，不承诺下一次重置时间：
 1. 打开仓库的 [Releases](https://github.com/JaynOwO/tibo-button/releases) 页面。
 2. 下载 TiboButton-vX.Y.Z.apk，当前稳定版为 TiboButton-v0.3.1.apk。
 3. 可选：使用同一 Release 中的 SHA256SUMS.txt 校验文件完整性。
-4. 在 Android 上安装 APK，并在 Launcher 的 Widget 选择器中添加 Tibo Button。
+4. 在 Android 上安装 APK，并在 Launcher 的 Widget 选择器中选择 Tibo Button 的任意一种布局。
 
 公开 Release APK 使用同一项目签名密钥，以便未来版本覆盖更新。Debug APK 是开发构建，可能无法覆盖由其他构建环境签名的 APK。
 
@@ -122,18 +124,20 @@ Tibo Button is an unofficial Android companion app and home-screen widget for vi
 | Area | Details |
 | --- | --- |
 | App details | Current reset status, next reset time or source wording, 24h / 48h probabilities, last reset, data source, and update time |
-| Widgets | 4×2 and 2×2 sizes with glanceable status, next reset, probabilities, last reset, trailing 7-day count, source, and update time |
+| Widgets | Four choices: standard 4×2, standard 2×2, Pulse Orb, and Command Deck, all using the real status and update time |
 | Reset Pulse | Uses up to seven real recent completed shared-reset events to calculate a trailing 7-day count, average interval, and recent streak |
 | Refresh | Immediate refresh in the app and widgets with a deterministic loading state and “正在刷新…” feedback |
 | Notifications | Scheduled / confirmed and completed resets are enabled by default; “very likely” is optional and off by default, with event deduplication |
 | Updater | Checks only the public stable GitHub Release; download and installation always require user confirmation and verify version, package, SHA-256, and signing certificate |
 
-### Widget sizes
+### Widget choices
 
-- **4×2 widget:** TIBO RESET RADAR, refresh control, next reset, certainty status, 24h / 48h probabilities, last reset, trailing 7-day count, Reset Beacon source, and update time.
-- **2×2 widget:** Prioritizes current status, next reset, 24h / 48h probabilities, and update time so the compact layout remains readable.
+- **Standard 4×2:** TIBO RESET RADAR, refresh control, next reset, certainty status, 24h / 48h probabilities, last reset, trailing 7-day count, Reset Beacon source, and update time.
+- **Standard 2×2:** Prioritizes current status, next reset, 24h / 48h probabilities, and update time so the compact layout remains readable.
+- **Pulse Orb:** A static state-colored halo emphasizes the current signal while retaining next reset, 24h / 48h probabilities, last reset, and source/update time.
+- **Command Deck:** A compact control-deck layout emphasizes the next reset and places 24h / 48h probabilities, last reset, and trailing statistics in separate metric areas.
 
-Widgets use an opaque dark surface and a deterministic loading-state swap. They do not depend on continuous launcher-side animation or add high-frequency background refreshes.
+All four widgets use an opaque dark surface and a deterministic loading-state swap. They do not depend on continuous launcher-side animation or add high-frequency background refreshes. The Pulse Orb halo communicates the current state color only; it does not add or imply forecast data.
 
 ### Reset Pulse rules
 
@@ -152,7 +156,7 @@ Reset Pulse is an explainable activity summary, not a promise about the next res
 1. Open the repository’s [Releases](https://github.com/JaynOwO/tibo-button/releases) page.
 2. Download TiboButton-vX.Y.Z.apk; the current stable release is TiboButton-v0.3.1.apk.
 3. Optionally verify the file against SHA256SUMS.txt from the same Release.
-4. Install the APK on Android and add either Tibo Button widget from the Launcher widget picker.
+4. Install the APK on Android and choose any Tibo Button layout from the Launcher widget picker.
 
 Public release APKs use one stable project signing key so future versions can upgrade an existing install. Debug APKs are development artifacts and may not upgrade over APKs signed by another build environment.
 

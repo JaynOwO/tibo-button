@@ -4,4 +4,10 @@
     <dimen name="control_min_height">48dp</dimen>
     <dimen name="section_gap">18dp</dimen>
     <dimen name="small_gap">8dp</dimen>
+    <dimen name="widget_padding">14dp</dimen>
+    <dimen name="widget_refresh_size">48dp</dimen>
+    <dimen name="widget_orb_size">58dp</dimen>
+    <dimen name="widget_orb_gap">12dp</dimen>
+    <dimen name="widget_metric_padding">7dp</dimen>
+    <dimen name="widget_metric_gap">4dp</dimen>
 </resources>

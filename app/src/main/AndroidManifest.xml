@@ -54,5 +54,27 @@
                 android:resource="@xml/tibo_widget_small_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.TiboPulseOrbWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tibo_widget_pulse_orb_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.TiboCommandDeckWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tibo_widget_command_deck_info" />
+        </receiver>
+
     </application>
 </manifest>

@@ -26,4 +26,11 @@
     <color name="widget_outline">#3AFFFFFF</color>
     <color name="widget_action_bg">#2AFFFFFF</color>
     <color name="refresh_icon">#E6EBF5</color>
+    <color name="widget_orb_halo">#263A2D5C</color>
+    <color name="widget_orb_outline">#5AB58CFF</color>
+    <color name="widget_orb_core_outline">#70FFFFFF</color>
+    <color name="widget_deck_surface">#FF121923</color>
+    <color name="widget_deck_outline">#4AFFFFFF</color>
+    <color name="widget_metric_surface">#261E2738</color>
+    <color name="widget_metric_outline">#3DB58CFF</color>
 </resources>

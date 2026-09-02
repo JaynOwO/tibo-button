@@ -25,15 +25,16 @@
             android:letterSpacing="0.04" />
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/pill_bg">
+            android:id="@+id/refresh_hit"
+            android:layout_width="@dimen/widget_refresh_size"
+            android:layout_height="@dimen/widget_refresh_size"
+            android:background="@drawable/pill_bg"
+            android:importantForAccessibility="no">
 
             <ImageView
                 android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/refresh"
                 android:padding="6dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_refresh" />

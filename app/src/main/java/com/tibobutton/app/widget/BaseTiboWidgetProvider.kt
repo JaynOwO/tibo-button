@@ -8,6 +8,8 @@ import android.content.Intent
 import com.tibobutton.app.work.WidgetScheduler
 
 abstract class BaseTiboWidgetProvider : AppWidgetProvider() {
+    abstract val widgetVariant: WidgetVariant
+
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
         WidgetScheduler.ensurePeriodic(context)
@@ -16,7 +18,7 @@ abstract class BaseTiboWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         super.onUpdate(context, manager, ids)
-        WidgetRenderer.updateAll(context)
+        WidgetRenderer.update(context, ids, widgetVariant)
         WidgetScheduler.ensurePeriodic(context)
         WidgetScheduler.refreshNow(context)
     }
@@ -37,7 +39,11 @@ abstract class BaseTiboWidgetProvider : AppWidgetProvider() {
         val manager = AppWidgetManager.getInstance(context)
         val wide = manager.getAppWidgetIds(ComponentName(context, TiboWideWidgetProvider::class.java))
         val small = manager.getAppWidgetIds(ComponentName(context, TiboSmallWidgetProvider::class.java))
-        if (wide.isEmpty() && small.isEmpty()) WidgetScheduler.stopPeriodic(context)
+        val pulseOrb = manager.getAppWidgetIds(ComponentName(context, TiboPulseOrbWidgetProvider::class.java))
+        val commandDeck = manager.getAppWidgetIds(ComponentName(context, TiboCommandDeckWidgetProvider::class.java))
+        if (wide.isEmpty() && small.isEmpty() && pulseOrb.isEmpty() && commandDeck.isEmpty()) {
+            WidgetScheduler.stopPeriodic(context)
+        }
     }
 
     companion object {

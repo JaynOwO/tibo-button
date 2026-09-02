@@ -5,18 +5,18 @@ This checklist covers the device-level behavior that cannot be proven by the JVM
 ## Preconditions
 
 - Install the debug APK from the `Build Android APK` artifact, or install the current signed stable APK when checking upgrade behavior.
-- Add both the 4×2 and 2×2 Tibo Button widgets to the home screen.
+- Add the standard 4×2 and 2×2 widgets plus Pulse Orb and Command Deck to the home screen when the launcher supports all four choices.
 - Use a wallpaper with both dark and bright areas behind the widgets.
 - Record the device model, One UI version, Android version, display size, and font size with the result.
 
 ## Layout and typography matrix
 
-| Scenario | 4×2 Widget | 2×2 Widget | App details |
-| --- | --- | --- | --- |
-| Default display and font | No overlap, status is primary, both probabilities visible | Status, next reset, 24H / 48H probabilities and update footer remain readable | Status card is first; buttons have clear hierarchy |
-| Large font | Text remains identifiable and does not cover the refresh control | No clipped status or probability text that changes its meaning | Time metadata, buttons, Pulse summary and history wrap without collision |
-| Largest practical font | Widget still has an understandable status and fallback text | No unreadable multi-line overflow | Timeline remains supplementary; text history remains understandable |
-| Bright/complex wallpaper | Opaque surface and border preserve contrast | Same | Cards and status colors remain distinguishable without relying on color alone |
+| Scenario | Standard 4×2 | Standard 2×2 | Pulse Orb | Command Deck | App details |
+| --- | --- | --- | --- | --- | --- |
+| Default display and font | No overlap, status is primary, both probabilities visible | Status, next reset, 24H / 48H probabilities and update footer remain readable | Orb, status, next reset and probabilities are clear | Next reset, two metric blocks and statistics are clear | Status card is first; buttons have clear hierarchy |
+| Large font | Text remains identifiable and does not cover the refresh control | No clipped status or probability text that changes its meaning | Orb remains distinct; text stays readable beside it | Metric values and next reset do not overlap | Time metadata, buttons, Pulse summary and history wrap without collision |
+| Largest practical font | Widget still has an understandable status and fallback text | No unreadable multi-line overflow | Status and fallback text remain understandable | Status and fallback text remain understandable | Timeline remains supplementary; text history remains understandable |
+| Bright/complex wallpaper | Opaque surface and border preserve contrast | Same | Halo remains decorative while text remains legible | Metric outlines remain legible | Cards and status colors remain distinguishable without relying on color alone |
 
 ## State and interaction matrix
 
@@ -25,10 +25,10 @@ This checklist covers the device-level behavior that cannot be proven by the JVM
 - Stale forecast: mark the data stale and do not present old probabilities as current.
 - No data: show an explicit unknown state without invented time or probability.
 - Offline refresh failure: retain the last successful cache, show the failure indication, and keep the source/update time understandable.
-- Widget refresh: tap the refresh control and verify the deterministic loading icon plus `正在刷新…`; tap again while loading and verify there is no visible duplicate animation or broken layout; confirm normal state returns after success or failure.
+- Widget refresh: test all four variants, tap the refresh control and verify the deterministic loading icon plus `正在刷新…`; tap again while loading and verify there is no visible duplicate animation or broken layout; confirm normal state returns after success or failure.
 - App refresh: verify the button disables immediately, shows loading feedback, and returns to the normal label after WorkManager finishes or retries.
 - Notifications: verify permission/settings behavior, scheduled/confirmed and completed notifications, optional likely notifications, and no repeated notification for the same event.
-- Accessibility: use TalkBack or the device accessibility inspector and verify the status summary, refresh action, loading state, Pulse summary, and source action have meaningful descriptions.
+- Accessibility: use TalkBack or the device accessibility inspector and verify the status summary, refresh action, loading state, Pulse Orb status core, Command Deck probability metrics, Pulse summary, and source action have meaningful descriptions.
 
 ## Result recording
 
