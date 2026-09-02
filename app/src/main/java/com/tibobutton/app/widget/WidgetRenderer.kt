@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
@@ -138,8 +137,7 @@ object WidgetRenderer {
                 R.id.status_label,
                 context.getString(R.string.widget_status_format, text.statusEmoji, text.statusLabel)
             )
-            setImageViewResource(R.id.status_orb, R.drawable.widget_orb_core)
-            setImageViewTintList(R.id.status_orb, ColorStateList.valueOf(levelColor(context, state.level)))
+            setImageViewResource(R.id.status_orb, levelOrbResource(state.level))
             setTextViewText(R.id.next_time, nextText(context, text.next, short = false))
             setTextViewText(R.id.probability, probabilityText(context, text, wide = false))
             setTextViewText(
@@ -384,6 +382,15 @@ object WidgetRenderer {
         ResetLevel.LOW -> R.color.status_low
         ResetLevel.STALE -> R.color.status_stale
         ResetLevel.UNLIKELY, ResetLevel.UNKNOWN -> R.color.status_unknown
+    }
+
+    private fun levelOrbResource(level: ResetLevel): Int = when (level) {
+        ResetLevel.CONFIRMED -> R.drawable.widget_orb_confirmed
+        ResetLevel.VERY_LIKELY -> R.drawable.widget_orb_likely
+        ResetLevel.POSSIBLE -> R.drawable.widget_orb_possible
+        ResetLevel.LOW -> R.drawable.widget_orb_low
+        ResetLevel.STALE -> R.drawable.widget_orb_stale
+        ResetLevel.UNLIKELY, ResetLevel.UNKNOWN -> R.drawable.widget_orb_core
     }
 
     private val clockFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())

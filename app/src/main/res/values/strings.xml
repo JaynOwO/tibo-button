@@ -94,8 +94,8 @@
     <string name="status_explanation_confirmed_timed">说明：Reset Beacon 已给出明确排期；时间已换算为本机时区。</string>
     <string name="status_explanation_confirmed_unparsed">说明：已检测到明确排期/确认信号，但没有可靠的机器可读时间，因此不猜具体时刻。</string>
     <string name="status_explanation_very_likely">说明：未来 24H 概率已达到 75% 或以上，但目前还没有明确排期。</string>
-    <string name="status_explanation_possible">说明：存在公开 intent 信号，或 24H 概率处于 45%–74%。</string>
-    <string name="status_explanation_low">说明：24H 概率处于 20%–44%，暂时更像风声而不是按钮声。</string>
+    <string name="status_explanation_possible" formatted="false">说明：存在公开 intent 信号，或 24H 概率处于 45%–74%。</string>
+    <string name="status_explanation_low" formatted="false">说明：24H 概率处于 20%–44%，暂时更像风声而不是按钮声。</string>
     <string name="status_explanation_unlikely">说明：当前 24H 概率低于 20%，没有足够证据判断近期会重置。</string>
     <string name="status_explanation_stale">说明：上游预测已过期；旧概率不会继续伪装成实时数据。</string>
     <string name="status_explanation_unknown">说明：尚未取得足够的有效预测数据。</string>
